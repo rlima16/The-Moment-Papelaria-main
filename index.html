@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Moment — Loja</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="main-header">
+    <div class="header-logo">
+      <a href="index.html">
+        <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
+      </a>
+    </div>
+
+    <div class="header-search">
+      <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
+      <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
+    </div>
+
+    <div class="header-user-actions">
+
+        <div class="action-item" id="user-actions-container">
+            <i class="fa-regular fa-user"></i>
+            <div class="action-text">
+
+                <a href="#" id="auth-link">Login | Cadastre-se</a>
+
+                <div id="user-menu-trigger" class="hidden">
+                    <span id="user-info"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="user-dropdown" class="dropdown-content hidden">
+            <a href="minha-conta.html">Minha Conta</a>
+            <a href="#" id="logout-link">Sair</a>
+        </div>
+
+
+        <div class="action-item">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <div class="action-text">
+                <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
+                <span id="cart-total-value">R$ 0,00</span>
+            </div>
+        </div>
+    </div>
+  </header>
+
+  <nav class="secondary-nav">
+    <a href="index.html" class="active">Página Inicial</a>
+    <a href="produtos.html">Produtos</a>
+    <a href="#contato">Contato</a>
+  </nav>
+
+  <section class="hero">
+    <div class="welcome-text">
+      <h1>✨ Bem-vindos à The Moment! ✨</h1>
+      <p>Há 7 anos, transformamos sonhos em detalhes únicos para deixar suas festas ainda mais especiais.</p>
+    </div>
+    <a href="produtos.html" class="btn">Ver todos os produtos</a>
+  </section>
+
+  <section class="produtos">
+    <h2>Conheça Nossos Trabalhos</h2>
+    <div class="swiper">
+      <div class="swiper-wrapper" id="carousel-wrapper">
+        </div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+
+  <section class="centered-section">
+    <h2>Também temos Produtos Físicos! 🍰</h2>
+    <p>Visite nossa loja oficial na Shopee para ver nossa coleção completa.</p>
+  </section>
+
+  <div class="shopee-bar">
+    <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer">Visite nossa Loja na Shopee</a>
+  </div>
+
+  <div class="image-gallery">
+      <div class="gallery-item">
+          <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lxtuoetly7w6c7.webp" alt="Topo de bolo físico Harry Potter" onclick="openLightbox(this.src)">
+      </div>
+      <div class="gallery-item">
+          <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mcxx7mixlx6a5d.webp" alt="Topo de bolo físico Turma da Monica" onclick="openLightbox(this.src)">
+      </div>
+      <div class="gallery-item">
+          <img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lxu0w6xx129r7e.webp" alt="Topo de bolo físico Monstros S.A." onclick="openLightbox(this.src)">
+      </div>
+      <div class="gallery-item">
+          <img src="https://down-br.img.susercontent.com/file/br-11134207-81z1k-meacsisnzsw175.webp" alt="Topo de bolo físico Minions" onclick="openLightbox(this.src)">
+      </div>
+  </div>
+
+  <footer id="contato">
+    <p>The Moment</p>
+    <p>Email: shop.themomentofficial@gmail.com</p>
+    <p>Telefone: (11) 2050-4970</p>
+    <p>Atendimento: De Seg a Sex das 09h às 18h</p>
+  </footer>
+
+  <div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" alt="preview" onclick="event.stopPropagation()" />
+  </div>
+
+  <div id="auth-modal" class="auth-modal hidden" role="dialog" aria-modal="true">
+    <div class="auth-box">
+      <span class="auth-close" onclick="closeAuthModal()" aria-label="Fechar">&times;</span>
+
+      <div id="login-view">
+        <h2>Login</h2>
+        <form id="login-form" autocomplete="on">
+          <input type="email" id="login-email" placeholder="E-mail" required />
+          <input type="password" id="login-password" placeholder="Senha" required minlength="6" />
+          <button type="submit" class="btn">Entrar</button>
+          <p id="login-error" class="error-message hidden" role="alert"></p>
+        </form>
+        <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
+      </div>
+
+      <div id="register-view" class="hidden">
+        <h2>Cadastre-se</h2>
+        <form id="signup-form" autocomplete="on">
+          <input type="email" id="signup-email" placeholder="E-mail" required />
+          <input type="password" id="signup-password" placeholder="Senha (mínimo 6 caracteres)" required minlength="6" />
+          <button type="submit" class="btn">Criar Conta</button>
+          <p id="signup-error" class="error-message hidden" role="alert"></p>
+        </form>
+        <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginView(); return false;">Faça Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="products-data.js"></script>
+  <script type="module" src="firebase-auth.js"></script>
+  <script type="module" src="shared-functions.js"></script>
+  <script type="module" src="script.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</body>
+</html>

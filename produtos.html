@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos os Produtos - The Moment</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+      <header class="main-header">
+    <div class="header-logo">
+      <a href="index.html">
+        <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
+      </a>
+    </div>
+
+    <div class="header-search">
+      <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
+      <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
+    </div>
+
+<div class="header-user-actions">
+
+    <div class="action-item" id="user-actions-container">
+        <i class="fa-regular fa-user"></i>
+        <div class="action-text">
+
+            <a href="#" id="auth-link">Login | Cadastre-se</a>
+
+            <div id="user-menu-trigger" class="hidden" style="cursor: pointer;">
+                <span id="user-info"></span>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="user-dropdown" class="dropdown-content hidden">
+        <a href="minha-conta.html">Minha Conta</a>
+        <a href="#" id="logout-link">Sair</a>
+    </div>
+
+
+    <div class="action-item">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <div class="action-text">
+            <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
+            <span id="cart-total-value">R$ 0,00</span>
+        </div>
+    </div>
+
+</div>
+
+  </header>
+
+    <nav class="secondary-nav">
+        <a href="index.html">Página Inicial</a>
+        <a href="produtos.html" class="active">Produtos</a>
+        <a href="index.html#contato">Contato</a>
+    </nav>
+
+    <main class="produtos" style="margin-top: 0; min-height: 70vh;">
+        <h1>Todos os Nossos Produtos</h1>
+        <div id="all-products-list" class="grid">
+            <!-- Produtos inseridos via JS -->
+        </div>
+    </main>
+
+    <footer id="contato">
+        <p>The Moment</p>
+        <p>Email: shop.themomentofficial@gmail.com</p>
+        <p>Telefone: (11) 2050-4970</p>
+        <p>Atendimento: De Seg a Sex das 09 as 18 Hrs</p>
+    </footer>
+
+    <div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="event.stopPropagation(); closeLightbox();">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" onclick="event.stopPropagation()">
+    </div>
+
+    <div id="auth-modal" class="auth-modal hidden">
+        <div class="auth-box">
+            <span class="auth-close" onclick="closeAuthModal()">&times;</span>
+            <div id="login-view">
+                <h2>Login</h2>
+                <form id="login-form" autocomplete="on">
+                    <input type="email" id="login-email" placeholder="E-mail" required>
+                    <input type="password" id="login-password" placeholder="Senha" required minlength="6">
+                    <button type="submit" class="btn">Entrar</button>
+                    <p id="login-error" class="error-message hidden"></p>
+                </form>
+                <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
+            </div>
+            <div id="register-view" class="hidden">
+                <h2>Cadastre-se</h2>
+                <form id="register-form" autocomplete="on">
+                    <input type="email" id="register-email" placeholder="E-mail" required>
+                    <input type="password" id="register-password" placeholder="Senha (mínimo 6 caracteres)" required minlength="6">
+                    <button type="submit" class="btn">Criar Conta</button>
+                    <p id="register-error" class="error-message hidden"></p>
+                </form>
+                <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginView(); return false;">Faça Login</a></p>
+            </div>
+        </div>
+    </div>
+
+<script type="module" src="products-data.js"></script>
+<script type="module" src="firebase-auth.js"></script>
+<script type="module" src="shared-functions.js"></script>
+<script type="module" src="produtos-page.js"></script>  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</body>
+</html>

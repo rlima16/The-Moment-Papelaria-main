@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Conta - The Moment</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="main-header">
+    <!-- mesmo header da página inicial -->
+    ...
+  </header>
+
+  <nav class="secondary-nav">
+    <a href="index.html">Página Inicial</a>
+    <a href="produtos.html">Produtos</a>
+    <a href="index.html#contato">Contato</a>
+  </nav>
+
+  <main class="account-page-container">
+    <a href="produtos.html" class="btn btn-secondary" style="width:auto;padding:10px 25px;margin-bottom:20px;">‹ Voltar à Loja</a>
+    <h1>Minha Conta</h1>
+    <p id="welcome-message">Carregando informações...</p>
+    <h2>Seu Histórico de Pedidos</h2>
+    <div id="order-history-container"></div>
+    <p id="no-orders-message" class="hidden">Você ainda não fez nenhum pedido.</p>
+  </main>
+
+  <footer id="contato"></footer>
+
+<script type="module" src="products-data.js"></script>
+<script type="module" src="firebase-auth.js"></script>
+<script type="module" src="shared-functions.js"></script>
+<script type="module" src="account-page.js"></script> <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</body>
+</html>
