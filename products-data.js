@@ -4,7 +4,8 @@ export const products = [
         image: 'https://down-br.img.susercontent.com/file/br-11134207-7r98o-lx78228g7beed9.webp',
         title: 'Topo de Bolo Magali Frutas',
         price: 4.00,
-        featured: true
+        featured: true,
+        filePath: '\Users\rodri.NOTE_RODRIGO\OneDrive\Desktop\Jujutsu.rar'
     },
     {
         id: 2,
