@@ -1,38 +1,35 @@
-// script.js (Versão Final com Carrossel Corrigido)
+// script.js ATUALIZADO
 
-// Lista de imagens do carrossel
-const carouselImages = [
-    'https://down-bs-br.img.susercontent.com/br-11134210-7r98o-mbkd16ucq6bce5.webp',
-    'https://down-bs-br.img.susercontent.com/br-11134210-7r98o-mbkd16ucaq5e1a.webp',
-    'https://down-bs-br.img.susercontent.com/br-11134210-7r98o-mbkd16ucaq2g28.webp',
-];
+import { products } from './products-data.js'; // Importa os produtos
 
-// Executa as funções quando o DOM da página estiver pronto
+// Executa as funções quando a página estiver pronta
 document.addEventListener('DOMContentLoaded', function () {
     displayCarousel();
-    setupSearch();
 });
 
-// Função para criar e inicializar o carrossel
-// Dentro do arquivo script.js
-
+// Função para criar e inicializar o carrossel com os produtos em destaque
 function displayCarousel() {
     const carouselWrapper = document.getElementById('carousel-wrapper');
     if (!carouselWrapper) return;
 
+    // Filtra apenas os produtos marcados como "featured: true"
+    const featuredProducts = products.filter(product => product.featured === true);
+
+    // Limpa o conteúdo antigo do carrossel
     carouselWrapper.innerHTML = '';
 
-    carouselImages.forEach(imageUrl => {
+    // Cria um slide para cada produto em destaque
+    featuredProducts.forEach(product => {
         const slide = document.createElement('div');
         slide.className = 'swiper-slide';
-        slide.innerHTML = `<img src="${imageUrl}" alt="Imagem do Carrossel" onclick="window.openLightbox('${imageUrl}')">`;
+        // A imagem agora abre o lightbox, como na página de produtos
+        slide.innerHTML = `<img src="${product.image}" alt="${product.title}" onclick="window.openLightbox('${product.image}')">`;
         carouselWrapper.appendChild(slide);
     });
 
+    // Inicializa o Swiper (código do carrossel em si)
     if (typeof Swiper !== "undefined") {
-        
-        // A MUDANÇA É AQUI: de ".mySwiper" para ".swiper"
-        new Swiper(".swiper", { 
+        new Swiper(".swiper", {
             effect: 'fade',
             autoplay: {
                 delay: 3500,
@@ -52,4 +49,3 @@ function displayCarousel() {
         console.warn("Biblioteca Swiper não foi carregada.");
     }
 }
-

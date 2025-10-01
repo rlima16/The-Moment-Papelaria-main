@@ -7,14 +7,53 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <header class="main-header">
-        </header>
+<body class="cart-page-body">
 
-    <nav class="secondary-nav">
+    <header class="main-header">
+        <div class="header-logo">
+            <a href="index.html">
+                <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
+            </a>
+        </div>
+        <div class="header-user-actions">
+            <div class="action-item" id="user-actions-container">
+                <i class="fa-regular fa-user"></i>
+                <div class="action-text">
+                    <a href="#" id="auth-link">Login | Cadastre-se</a>
+                    <div id="user-menu-trigger" class="hidden">
+                        <span id="user-info"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="user-dropdown" class="dropdown-content hidden">
+                <a href="minha-conta.html">Minha Conta</a>
+                <a href="#" id="logout-link">Sair</a>
+            </div>
+            <div class="action-item">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <div class="action-text">
+                    <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
+                    <span id="cart-total-value">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="search-nav-container">
+        <div class="header-search">
+            <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
+            <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
+        </div>
+        <nav class="secondary-nav">
+            <a href="index.html">Página Inicial</a>
+            <a href="produtos.html">Produtos</a>
+            <a href="index.html#contato">Contato</a>
         </nav>
+    </div>
 
     <main>
         <div class="cart-page-container">
@@ -22,10 +61,27 @@
     </main>
     
     <footer id="contato">
-        </footer>
+    <p>The Moment</p>
+    <p>Email: shop.themomentofficial@gmail.com</p>
+    <p>Telefone: (11) 2050-4970</p>
+    <p>Atendimento: De Seg a Sex das 09h às 18h</p>
+  </footer>
 
     <div id="auth-modal" class="auth-modal hidden">
         </div>
+    <div id="pix-instructions" class="pix-modal hidden">
+        <div class="pix-box">
+            <h2>Pagamento via PIX</h2>
+            <p>Seu pedido <strong id="order-id"></strong> foi registrado!</p>
+            <p>Para confirmar, realize o pagamento no valor de <strong id="pix-value"></strong> para a chave abaixo:</p>
+            <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/qr-code-pix.png?raw=true" alt="QR Code PIX" style="max-width: 200px; margin: 15px 0;">
+            <p><strong>Chave PIX (E-mail):</strong></p>
+            <input type="text" id="pix-key" value="shop.themomentofficial@gmail.com" readonly>
+            <button class="btn" onclick="copyPixKey()">Copiar Chave</button>
+            <p style="margin-top: 20px;">Após o pagamento, seu pedido será processado.</p>
+            <a href="index.html" style="font-size: 14px; color: #555;">Voltar à Loja</a>
+        </div>
+    </div>
 
     <script type="module" src="firebase-auth.js"></script>
     <script type="module" src="shared-functions.js"></script>
