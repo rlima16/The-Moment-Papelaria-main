@@ -17,27 +17,42 @@ export function updateCartInfo() {
     }
 }
 
+// NO ARQUIVO shared-functions.js
+// SUBSTITUA A FUNÇÃO ATUAL PELA VERSÃO ABAIXO:
+
 window.addToCart = function(event, productId) {
+    // Encontra o produto COMPLETO na nossa lista de produtos
     const product = products.find(p => p.id === productId);
-    if (!product) return;
-    cart.push(product);
+    if (!product) {
+        console.error("Produto não encontrado!");
+        return;
+    }
+    
+    // Adiciona o objeto INTEIRO do produto ao carrinho
+    cart.push(product); 
+    
     saveCartToSession();
     updateCartInfo();
     
     // Animação...
     const card = event.target.closest('.card');
+    if (!card) return;
     const productImage = card.querySelector('img');
     const endElement = document.querySelector('.fa-bag-shopping');
     if (!productImage || !endElement) return;
+    
     const startRect = productImage.getBoundingClientRect();
     const endRect = endElement.getBoundingClientRect();
     const flyingImage = productImage.cloneNode();
+    
     flyingImage.classList.add('flying-image');
     document.body.appendChild(flyingImage);
+    
     flyingImage.style.left = `${startRect.left}px`;
     flyingImage.style.top = `${startRect.top}px`;
     flyingImage.style.width = `${startRect.width}px`;
     flyingImage.style.height = `${startRect.height}px`;
+    
     requestAnimationFrame(() => {
         flyingImage.style.left = `${endRect.left + 15}px`;
         flyingImage.style.top = `${endRect.top + 10}px`;
@@ -45,6 +60,7 @@ window.addToCart = function(event, productId) {
         flyingImage.style.height = '20px';
         flyingImage.style.opacity = '0';
     });
+    
     setTimeout(() => { flyingImage.remove(); }, 600);
 };
 
