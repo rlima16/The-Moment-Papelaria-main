@@ -1,61 +1,50 @@
+// Importa as ferramentas necessárias
 const functions = require("firebase-functions");
 const mercadopago = require("mercadopago");
+const cors = require("cors")({ origin: true });
 
-// Configura o Mercado Pago com o Access Token que guardamos de forma segura
+// Carrega as variáveis de ambiente do arquivo .env
+require("dotenv").config();
+
+// Configura o Mercado Pago com a sua chave secreta
 mercadopago.configure({
-  access_token: functions.config().mercadopago.token,
+    access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
 });
 
-// Nossa função principal que será chamada pelo site
+/**
+ * Cloud Function que cria uma preferência de pagamento no Mercado Pago.
+ * Ela é chamada pelo nosso site (front-end).
+ */
 exports.createPaymentPreference = functions.https.onCall(async (data, context) => {
-  // Verifica se o usuário que está chamando a função está logado
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
-        "unauthenticated",
-        "Você precisa estar logado para criar um pedido.",
-    );
-  }
+    // 'data' contém as informações que nosso site enviou (o item do carrinho)
+    const item = data.item;
 
-  // Pega os itens do carrinho que o site enviou
-  const cartItems = data.items;
-  if (!cartItems || cartItems.length === 0) {
-    throw new functions.https.HttpsError(
-        "invalid-argument",
-        "O carrinho não pode estar vazio.",
-    );
-  }
-
-  // Monta o objeto de preferência de pagamento para o Mercado Pago
-  const preference = {
-    items: cartItems.map((item) => ({
-      title: item.title,
-      unit_price: Number(item.price),
-      quantity: 1,
-      currency_id: "BRL",
-    })),
-    back_urls: {
-      // URLs para onde o cliente será redirecionado após o pagamento
-      success: "https://r1ina16.github.io/carrinho.html?status=success", // Substitua pelo seu link
-      failure: "https://r1ina16.github.io/carrinho.html?status=failure", // Substitua pelo seu link
-      pending: "https://r1ina16.github.io/carrinho.html?status=pending", // Substitua pelo seu link
-    },
-    auto_return: "approved",
-  };
-
-  try {
-    // Tenta criar a preferência de pagamento no Mercado Pago
-    const response = await mercadopago.preferences.create(preference);
-    
-    // Se deu certo, devolve o link de pagamento para o site
-    return {
-      preferenceId: response.body.id,
-      init_point: response.body.init_point,
+    // Objeto de preferência que enviaremos ao Mercado Pago
+    const preference = {
+        items: [{
+            title: item.title,
+            unit_price: item.price,
+            quantity: 1,
+        }],
+        // URLs para onde o cliente será redirecionado
+        back_urls: {
+            success: "https://rlima16.github.io/The-Moment-Papelaria-main/carrinho.html?status=success", // URL do seu site ao vivo
+            failure: "https://rlima16.github.io/The-Moment-Papelaria-main/carrinho.html?status=failure",
+            pending: "https://rlima16.github.io/The-Moment-Papelaria-main/carrinho.html?status=pending",
+        },
+        auto_return: "approved", // Retorna automaticamente para o site após pagamento aprovado
     };
-  } catch (error) {
-    console.error("Erro ao criar preferência no Mercado Pago:", error);
-    throw new functions.https.HttpsError(
-        "internal",
-        "Não foi possível criar a preferência de pagamento.",
-    );
-  }
+
+    try {
+        const response = await mercadopago.preferences.create(preference);
+        console.log("Preferência de pagamento criada:", response.body);
+
+        // Retorna o link de checkout para o nosso site
+        return {
+            checkoutUrl: response.body.init_point,
+        };
+    } catch (error) {
+        console.error("Erro ao criar preferência de pagamento:", error);
+        throw new functions.https.HttpsError("internal", "Não foi possível criar a preferência de pagamento.");
+    }
 });

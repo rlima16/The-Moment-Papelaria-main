@@ -108,7 +108,7 @@ async function sendOrder() {
         
         let orderDescription = lastOrderData.items.map(item => `- ${item.title} (R$ ${item.price.toFixed(2).replace('.',',')})`).join('\n');
         let message = `Olá! 👋 Confirmo meu pedido:\n\n*Nº:* ${lastOrderData.orderId}\n*Cliente:* ${lastOrderData.userName}\n\n*Itens:*\n${orderDescription}\n\n*Total:* R$ ${lastOrderData.total.toFixed(2).replace('.', ',')}`;
-        const whatsappUrl = `https://wa.me/5511934165911?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/551120504970?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
         
         // Limpa o carrinho para a próxima compra
