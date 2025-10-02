@@ -751,3 +751,26 @@ footer p {
 .account-page-body .header-search {
     display: none;
 }
+
+/* --- ESTILO DO BOTÃO "ESQUECI A SENHA" --- */
+
+#forgot-password-link {
+    display: block; /* Faz o link ocupar a largura toda */
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px; /* Adiciona um espaço acima dele */
+    background-color: #fce4ec; /* Um tom de rosa mais claro */
+    color: #471a31; /* Cor do texto escura para contraste */
+    text-align: center;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+}
+
+#forgot-password-link:hover {
+    background-color: #f8bbd0; /* Um pouco mais escuro ao passar o mouse */
+    color: #471a31;
+}

@@ -1,6 +1,3 @@
-// firebase-auth.js (versão atualizada com "Esqueci a Senha")
-
-// Importa as funções necessárias do Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 import {
@@ -9,12 +6,12 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    sendPasswordResetEmail // <-- 1. FUNÇÃO NOVA IMPORTADA
+    sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
 const firebaseConfig = {
-    apiKey: "AIzaSyBhiNkiR7D_xI_W_2L2bLUG3gC1--HUn18",
+    apiKey: "AIzaSyBhiNkiR7D_xI_W_2L2bLUG3gC1--HUn18", // Garanta que a chave correta está aqui
     authDomain: "the-moment-b3e02.firebaseapp.com",
     projectId: "the-moment-b3e02",
     storageBucket: "the-moment-b3e02.appspot.com",
@@ -28,7 +25,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Exporta para outros scripts se necessário
+// Exporta para outros scripts
 export { auth, db, collection, addDoc, serverTimestamp };
 
 // --- GERENCIADOR DE ESTADO DO USUÁRIO ---
@@ -46,16 +43,14 @@ onAuthStateChanged(auth, (user) => {
         if(userMenuTrigger) userMenuTrigger.classList.add('hidden');
         
         const dropdown = document.getElementById('user-dropdown');
-        if (dropdown) {
-            dropdown.classList.add('hidden');
-        }
+        if (dropdown) dropdown.classList.add('hidden');
     }
 });
 
-// --- EVENT LISTENERS (AGORA EM UM ÚNICO BLOCO) ---
+// --- EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ===== LÓGICA DE LOGIN =====
+    // ===== LOGIN =====
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
@@ -64,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('login-password').value.trim();
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.closeAuthModal();
+                closeAuthModal();
             } catch (err) {
                 const loginError = document.getElementById('login-error');
                 if (loginError) {
@@ -75,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ===== LÓGICA DE CADASTRO =====
+    // ===== CADASTRO =====
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
@@ -84,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('signup-password').value.trim();
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
+                closeAuthModal();
             } catch (err) {
                 const signupError = document.getElementById('signup-error');
                 if (signupError) {
@@ -94,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ===== LÓGICA DE LOGOUT =====
+    // ===== LOGOUT =====
     const logoutBtn = document.getElementById('logout-link');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async (e) => {
@@ -103,7 +99,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // ===== LÓGICA DO DROPDOWN DO USUÁRIO =====
+    // ===== ESQUECI A SENHA =====
+    const forgotPasswordLink = document.getElementById('forgot-password-link');
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = prompt("Digite seu e-mail para redefinir a senha:");
+            if (email) {
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert("Link de redefinição enviado! Verifique seu e-mail.");
+                } catch (err) {
+                    alert("Não foi possível enviar o e-mail. Verifique se o e-mail está correto.");
+                }
+            }
+        });
+    }
+
+    // ===== LÓGICA DO DROPDOWN DO USUÁRIO (RESTAURADA) =====
     const menuTrigger = document.getElementById('user-menu-trigger');
     const dropdown = document.getElementById('user-dropdown');
     if (menuTrigger && dropdown) {
@@ -112,29 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
             dropdown.classList.toggle('hidden');
         });
     }
-
-    // ===== 2. NOVA LÓGICA PARA "ESQUECI A SENHA" =====
-    const forgotPasswordLink = document.getElementById('forgot-password-link');
-    if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            
-            const email = prompt("Por favor, digite seu e-mail para enviarmos o link de redefinição de senha:");
-
-            if (email) {
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    alert("Link de redefinição de senha enviado! Verifique sua caixa de entrada e spam.");
-                } catch (err) {
-                    console.error("Erro ao enviar e-mail de redefinição:", err);
-                    alert("Não foi possível enviar o e-mail. Verifique se o e-mail está correto e tente novamente.");
-                }
-            }
-        });
-    }
 });
 
-// Listener para fechar o dropdown se o usuário clicar fora dele
+// ===== Listener para fechar o dropdown ao clicar fora (RESTAURADO) =====
 window.addEventListener('click', () => {
     const dropdown = document.getElementById('user-dropdown');
     if (dropdown && !dropdown.classList.contains('hidden')) {
@@ -142,8 +135,7 @@ window.addEventListener('click', () => {
     }
 });
 
-
-// Função para mensagens mais amigáveis
+// Função para mensagens de erro amigáveis
 function traduzErroFirebase(code) {
     switch (code) {
         case "auth/invalid-email":      return "E-mail inválido.";
@@ -155,29 +147,27 @@ function traduzErroFirebase(code) {
 }
 
 // Funções globais para controle do Modal
-window.openAuthModal = window.openAuthModal || function() { /* ...código original... */ };
-window.closeAuthModal = window.closeAuthModal || function() { /* ...código original... */ };
-window.showRegisterView = window.showRegisterView || function() { /* ...código original... */ };
-window.showLoginView = window.showLoginView || function() { /* ...código original... */ };
-
-// Recoloquei as funções completas para garantir
-window.openAuthModal = window.openAuthModal || function() {
-  const modal = document.getElementById('auth-modal');
-  if (!modal) return;
-  document.getElementById('register-view')?.classList.add('hidden');
-  document.getElementById('login-view')?.classList.remove('hidden');
-  modal.classList.remove('hidden');
-};
-window.closeAuthModal = window.closeAuthModal || function() {
-  const modal = document.getElementById('auth-modal');
-  if (!modal) return;
-  modal.classList.add('hidden');
-};
-window.showRegisterView = window.showRegisterView || function() {
-  document.getElementById('login-view')?.classList.add('hidden');
-  document.getElementById('register-view')?.classList.remove('hidden');
-};
-window.showLoginView = window.showLoginView || function() {
-  document.getElementById('register-view')?.classList.add('hidden');
-  document.getElementById('login-view')?.classList.remove('hidden');
-};
+function openAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (!modal) return;
+    document.getElementById('register-view')?.classList.add('hidden');
+    document.getElementById('login-view')?.classList.remove('hidden');
+    modal.classList.remove('hidden');
+}
+function closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+}
+function showRegisterView() {
+    document.getElementById('login-view')?.classList.add('hidden');
+    document.getElementById('register-view')?.classList.remove('hidden');
+}
+function showLoginView() {
+    document.getElementById('register-view')?.classList.add('hidden');
+    document.getElementById('login-view')?.classList.remove('hidden');
+}
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.showRegisterView = showRegisterView;
+window.showLoginView = showLoginView;
