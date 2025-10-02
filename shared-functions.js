@@ -125,3 +125,23 @@ function setupSearch() {
         }
     });
 }
+
+// --- LÓGICA DO BOTÃO FLUTUANTE DO WHATSAPP ---
+
+// Pega o botão do WhatsApp
+const whatsappBtn = document.getElementById('whatsapp-float-btn');
+
+// Escuta o evento de rolagem da página
+window.addEventListener('scroll', () => {
+    // Se o botão existir na página
+    if (whatsappBtn) {
+        // Se o usuário rolou mais de 200 pixels para baixo
+        if (window.scrollY > 200) {
+            // Mostra o botão
+            whatsappBtn.classList.add('show');
+        } else {
+            // Esconde o botão
+            whatsappBtn.classList.remove('show');
+        }
+    }
+});
