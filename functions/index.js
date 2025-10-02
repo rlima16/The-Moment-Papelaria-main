@@ -1,14 +1,34 @@
-// Importa as ferramentas necessárias
 const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 const mercadopago = require("mercadopago");
-const cors = require("cors")({ origin: true });
 
-// Carrega as variáveis de ambiente do arquivo .env
+// Inicializa o app do Firebase Admin (necessário para mexer com usuários)
+admin.initializeApp();
+
+// Carrega as variáveis de ambiente (sua chave do Mercado Pago)
 require("dotenv").config();
-
-// Configura o Mercado Pago com a sua chave secreta
 mercadopago.configure({
     access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
+});
+
+/**
+ * Cloud Function para dar o privilégio de admin a um usuário.
+ * Ela recebe um e-mail e adiciona a etiqueta { admin: true } a ele.
+ */
+exports.setAdminRole = functions.https.onCall(async (data, context) => {
+    // Medida de segurança: Futuramente, podemos checar se quem chama já é admin.
+    // if (context.auth.token.admin !== true) {
+    //     return { error: "Apenas administradores podem adicionar outros administradores." };
+    // }
+    
+    try {
+        const user = await admin.auth().getUserByEmail(data.email);
+        await admin.auth().setCustomUserClaims(user.uid, { admin: true });
+        return { message: `Sucesso! O usuário ${data.email} agora é um administrador.` };
+    } catch (error) {
+        console.error(error);
+        return { error: "Ocorreu um erro ao definir o usuário como admin." };
+    }
 });
 
 /**

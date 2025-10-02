@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - The Moment</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-logo">
+            <a href="index.html">
+                <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
+            </a>
+        </div>
+        </header>
+
+    <main class="cart-page-container" style="max-width: 600px;">
+        <h1>Painel de Administração</h1>
+        <h2>Adicionar Novo Topo de Bolo</h2>
+
+        <form id="add-product-form">
+            <div class="form-group">
+                <label for="product-name">Nome do Produto</label>
+                <input type="text" id="product-name" required>
+            </div>
+            <div class="form-group">
+                <label for="product-price">Preço (ex: 15.00)</label>
+                <input type="number" id="product-price" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="product-image-url">URL da Imagem</label>
+                <input type="text" id="product-image-url" required>
+            </div>
+            <button type="submit" class="btn">Adicionar Produto</button>
+        </form>
+    </main>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>

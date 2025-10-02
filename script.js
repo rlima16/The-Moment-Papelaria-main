@@ -1,51 +1,50 @@
 // script.js ATUALIZADO
 
-import { products } from './products-data.js'; // Importa os produtos
+// Importa as ferramentas do Firebase
+import { db } from './firebase-auth.js';
+import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-// Executa as funções quando a página estiver pronta
-document.addEventListener('DOMContentLoaded', function () {
-    displayCarousel();
-});
 
-// Função para criar e inicializar o carrossel com os produtos em destaque
-function displayCarousel() {
+// A função do carrossel agora também é "async"
+async function displayCarousel() {
     const carouselWrapper = document.getElementById('carousel-wrapper');
     if (!carouselWrapper) return;
 
-    // Filtra apenas os produtos marcados como "featured: true"
-    const featuredProducts = products.filter(product => product.featured === true);
-
-    // Limpa o conteúdo antigo do carrossel
-    carouselWrapper.innerHTML = '';
-
-    // Cria um slide para cada produto em destaque
-    featuredProducts.forEach(product => {
-        const slide = document.createElement('div');
-        slide.className = 'swiper-slide';
-        // A imagem agora abre o lightbox, como na página de produtos
-        slide.innerHTML = `<img src="${product.image}" alt="${product.title}" onclick="window.openLightbox('${product.image}')">`;
-        carouselWrapper.appendChild(slide);
-    });
-
-    // Inicializa o Swiper (código do carrossel em si)
-    if (typeof Swiper !== "undefined") {
-        new Swiper(".swiper", {
-            effect: 'fade',
-            autoplay: {
-                delay: 3500,
-                disableOnInteraction: false,
-            },
-            loop: true,
-            navigation: {
-              nextEl: '.swiper-button-next',
-              prevEl: '.swiper-button-prev'
-            },
-            pagination: {
-              el: '.swiper-pagination',
-              clickable: true
-            },
+    try {
+        // 1. Cria uma consulta que busca na coleção "products" ONDE o campo "featured" é igual a "true"
+        const q = query(collection(db, "products"), where("featured", "==", true));
+        const querySnapshot = await getDocs(q);
+        
+        const featuredProducts = [];
+        querySnapshot.forEach((doc) => {
+            featuredProducts.push({ id: doc.id, ...doc.data() });
         });
-    } else {
-        console.warn("Biblioteca Swiper não foi carregada.");
+
+        carouselWrapper.innerHTML = '';
+
+        // 2. Cria um slide para cada produto encontrado
+        featuredProducts.forEach(product => {
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide';
+            slide.innerHTML = `<img src="${product.image}" alt="${product.title}" onclick="window.openLightbox('${product.image}')">`;
+            carouselWrapper.appendChild(slide);
+        });
+        
+        // 3. Inicializa o Swiper
+        if (typeof Swiper !== "undefined") {
+            new Swiper(".swiper", {
+                effect: 'fade',
+                autoplay: { delay: 3500, disableOnInteraction: false },
+                loop: true,
+                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                pagination: { el: '.swiper-pagination', clickable: true },
+            });
+        }
+
+    } catch (error) {
+        console.error("Erro ao buscar produtos para o carrossel:", error);
     }
 }
+
+// Executa quando a página carrega
+document.addEventListener('DOMContentLoaded', displayCarousel);

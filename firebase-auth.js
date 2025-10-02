@@ -11,7 +11,7 @@ import {
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
 const firebaseConfig = {
-    apiKey: "AIzaSyBhiNkiR7D_xI_W_2L2bLUG3gC1--HUn18", // Garanta que a chave correta está aqui
+    apiKey: "AIzaSyBhiNkiR7D_xI_W_2L2bLUG3gC1--HUn18",
     authDomain: "the-moment-b3e02.firebaseapp.com",
     projectId: "the-moment-b3e02",
     storageBucket: "the-moment-b3e02.appspot.com",
@@ -41,13 +41,10 @@ onAuthStateChanged(auth, (user) => {
     } else {
         if(authLink) authLink.classList.remove('hidden');
         if(userMenuTrigger) userMenuTrigger.classList.add('hidden');
-        
-        const dropdown = document.getElementById('user-dropdown');
-        if (dropdown) dropdown.classList.add('hidden');
     }
 });
 
-// --- EVENT LISTENERS ---
+// --- EVENT LISTENERS DOS FORMULÁRIOS DE AUTH ---
 document.addEventListener('DOMContentLoaded', () => {
 
     // ===== LOGIN =====
@@ -90,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ===== LOGOUT =====
+    // ===== LOGOUT (agora o listener está aqui) =====
     const logoutBtn = document.getElementById('logout-link');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async (e) => {
@@ -115,25 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // ===== LÓGICA DO DROPDOWN DO USUÁRIO (RESTAURADA) =====
-    const menuTrigger = document.getElementById('user-menu-trigger');
-    const dropdown = document.getElementById('user-dropdown');
-    if (menuTrigger && dropdown) {
-        menuTrigger.addEventListener('click', (event) => {
-            event.stopPropagation();
-            dropdown.classList.toggle('hidden');
-        });
-    }
 });
 
-// ===== Listener para fechar o dropdown ao clicar fora (RESTAURADO) =====
-window.addEventListener('click', () => {
-    const dropdown = document.getElementById('user-dropdown');
-    if (dropdown && !dropdown.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
-    }
-});
 
 // Função para mensagens de erro amigáveis
 function traduzErroFirebase(code) {

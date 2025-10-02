@@ -850,3 +850,38 @@ footer p {
     opacity: 1;
     visibility: visible;
 }
+
+/* --- ESTILO DOS BOTÕES DE PAGINAÇÃO --- */
+
+/* SUBSTITUA O BLOCO INTEIRO POR ESTE */
+
+#pagination-controls .btn {
+    /* Força o botão a ter a largura do seu conteúdo */
+    width: auto !important;
+    min-width: auto !important;
+
+    /* Mantém o resto do nosso estilo delicado */
+    background-color: transparent;
+    color: #ff69b4;
+    border: 2px solid #ff69b4;
+    padding: 5px 15px; /* Espaçamento interno */
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Efeito ao passar o mouse */
+#pagination-controls .btn:hover {
+    background-color: #ff69b4; /* Fundo fica rosa */
+    color: #fff; /* Texto fica branco */
+}
+
+/* Estilo para quando o botão estiver desabilitado */
+#pagination-controls .btn:disabled {
+    border-color: #e0e0e0; /* Borda cinza claro */
+    color: #e0e0e0; /* Texto cinza claro */
+    background-color: transparent;
+    cursor: not-allowed; /* Cursor de "não permitido" */
+}
