@@ -125,12 +125,17 @@
       <div id="login-view">
         <h2>Login</h2>
         <form id="login-form" autocomplete="on">
-          <input type="email" id="login-email" placeholder="E-mail" required />
-          <input type="password" id="login-password" placeholder="Senha" required minlength="6" />
-          <button type="submit" class="btn">Entrar</button>
-          <p id="login-error" class="error-message hidden" role="alert"></p>
-        </form>
-        <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
+    <input type="email" id="login-email" placeholder="E-mail" required>
+    <input type="password" id="login-password" placeholder="Senha" required minlength="6">
+    <button type="submit" class="btn">Entrar</button>
+    <p id="login-error" class="error-message hidden"></p>
+</form>
+
+<p class="auth-switch" style="text-align: right; margin-top: -5px; font-size: 13px;">
+    <a href="#" id="forgot-password-link">Esqueci a senha</a>
+</p>
+
+<p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
       </div>
 
       <div id="register-view" class="hidden">

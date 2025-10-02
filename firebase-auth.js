@@ -1,4 +1,4 @@
-// firebase-auth.js (versão completa com Autenticação + Firestore + Login funcionando)
+// firebase-auth.js (versão atualizada com "Esqueci a Senha")
 
 // Importa as funções necessárias do Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
@@ -8,7 +8,8 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    sendPasswordResetEmail // <-- 1. FUNÇÃO NOVA IMPORTADA
 } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 // --- CONFIGURAÇÃO DO FIREBASE ---
@@ -31,27 +32,19 @@ const db = getFirestore(app);
 export { auth, db, collection, addDoc, serverTimestamp };
 
 // --- GERENCIADOR DE ESTADO DO USUÁRIO ---
-// SUBSTITUA A FUNÇÃO onAuthStateChanged INTEIRA POR ESTA:
-
-// SUBSTITUA A onAuthStateChanged INTEIRA PELA VERSÃO ABAIXO:
-
 onAuthStateChanged(auth, (user) => {
     const authLink = document.getElementById('auth-link');
     const userMenuTrigger = document.getElementById('user-menu-trigger');
     const userInfo = document.getElementById('user-info');
 
     if (user) {
-        // --- SE O USUÁRIO ESTIVER LOGADO ---
-        authLink.classList.add('hidden'); // Esconde "Login | Cadastre-se"
-        userMenuTrigger.classList.remove('hidden'); // Mostra o menu do usuário
-        userInfo.textContent = `Olá, ${user.email.split('@')[0]}`; // Define o nome
-
+        if(authLink) authLink.classList.add('hidden');
+        if(userMenuTrigger) userMenuTrigger.classList.remove('hidden');
+        if(userInfo) userInfo.textContent = `Olá, ${user.email.split('@')[0]}`;
     } else {
-        // --- SE O USUÁRIO ESTIVER DESLOGADO ---
-        authLink.classList.remove('hidden'); // Mostra "Login | Cadastre-se"
-        userMenuTrigger.classList.add('hidden'); // Esconde o menu do usuário
+        if(authLink) authLink.classList.remove('hidden');
+        if(userMenuTrigger) userMenuTrigger.classList.add('hidden');
         
-        // Garante que o dropdown também feche ao deslogar
         const dropdown = document.getElementById('user-dropdown');
         if (dropdown) {
             dropdown.classList.add('hidden');
@@ -59,53 +52,40 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// --- EVENT LISTENERS ---
-// Toda a lógica de formulários
+// --- EVENT LISTENERS (AGORA EM UM ÚNICO BLOCO) ---
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ===== LOGIN =====
-    const loginForm  = document.getElementById('login-form');
-    const loginError = document.getElementById('login-error');
-
-
-
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // evita recarregar a página
-
-        const email    = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            window.closeAuthModal(); // <--- ADICIONE ESTA LINHA AQUI
-            // onAuthStateChanged cuidará da interface
-        } catch (err) {
-            console.error(err);
-            if (loginError) {
-                loginError.textContent = traduzErroFirebase(err.code);
-                loginError.classList.remove('hidden');
+    // ===== LÓGICA DE LOGIN =====
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.closeAuthModal();
+            } catch (err) {
+                const loginError = document.getElementById('login-error');
+                if (loginError) {
+                    loginError.textContent = traduzErroFirebase(err.code);
+                    loginError.classList.remove('hidden');
+                }
             }
-        }
-    });
-}
+        });
+    }
 
-    // ===== CADASTRO (opcional) =====
-    const signupForm  = document.getElementById('signup-form');
-    const signupError = document.getElementById('signup-error');
-
+    // ===== LÓGICA DE CADASTRO =====
+    const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const email    = document.getElementById('signup-email').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value.trim();
-
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
-                // Aqui você poderia também salvar dados no Firestore, se desejar
             } catch (err) {
-                console.error(err);
+                const signupError = document.getElementById('signup-error');
                 if (signupError) {
                     signupError.textContent = traduzErroFirebase(err.code);
                     signupError.classList.remove('hidden');
@@ -114,7 +94,7 @@ if (loginForm) {
         });
     }
 
-    // ===== LOGOUT =====
+    // ===== LÓGICA DE LOGOUT =====
     const logoutBtn = document.getElementById('logout-link');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async (e) => {
@@ -122,7 +102,46 @@ if (loginForm) {
             await signOut(auth);
         });
     }
+    
+    // ===== LÓGICA DO DROPDOWN DO USUÁRIO =====
+    const menuTrigger = document.getElementById('user-menu-trigger');
+    const dropdown = document.getElementById('user-dropdown');
+    if (menuTrigger && dropdown) {
+        menuTrigger.addEventListener('click', (event) => {
+            event.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+    }
+
+    // ===== 2. NOVA LÓGICA PARA "ESQUECI A SENHA" =====
+    const forgotPasswordLink = document.getElementById('forgot-password-link');
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const email = prompt("Por favor, digite seu e-mail para enviarmos o link de redefinição de senha:");
+
+            if (email) {
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert("Link de redefinição de senha enviado! Verifique sua caixa de entrada e spam.");
+                } catch (err) {
+                    console.error("Erro ao enviar e-mail de redefinição:", err);
+                    alert("Não foi possível enviar o e-mail. Verifique se o e-mail está correto e tente novamente.");
+                }
+            }
+        });
+    }
 });
+
+// Listener para fechar o dropdown se o usuário clicar fora dele
+window.addEventListener('click', () => {
+    const dropdown = document.getElementById('user-dropdown');
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+    }
+});
+
 
 // Função para mensagens mais amigáveis
 function traduzErroFirebase(code) {
@@ -131,12 +150,17 @@ function traduzErroFirebase(code) {
         case "auth/user-not-found":     return "Usuário não encontrado.";
         case "auth/wrong-password":     return "Senha incorreta.";
         case "auth/email-already-in-use": return "E-mail já cadastrado.";
-        default: return "Não foi possível completar a ação.";
+        default: return "Ocorreu um erro. Tente novamente.";
     }
 }
 
-// no final do arquivo firebase-auth.js (após definir onAuthStateChanged e listeners):
-// garante que as funções existam (são chamadas pelo shared-functions.js)
+// Funções globais para controle do Modal
+window.openAuthModal = window.openAuthModal || function() { /* ...código original... */ };
+window.closeAuthModal = window.closeAuthModal || function() { /* ...código original... */ };
+window.showRegisterView = window.showRegisterView || function() { /* ...código original... */ };
+window.showLoginView = window.showLoginView || function() { /* ...código original... */ };
+
+// Recoloquei as funções completas para garantir
 window.openAuthModal = window.openAuthModal || function() {
   const modal = document.getElementById('auth-modal');
   if (!modal) return;
@@ -157,35 +181,3 @@ window.showLoginView = window.showLoginView || function() {
   document.getElementById('register-view')?.classList.add('hidden');
   document.getElementById('login-view')?.classList.remove('hidden');
 };
-
-// --- LÓGICA PARA EXIBIR O MENU DROPDOWN DO USUÁRIO ---
-
-// Executa quando o conteúdo da página é carregado
-document.addEventListener('DOMContentLoaded', () => {
-
-    const menuTrigger = document.getElementById('user-menu-trigger');
-    const dropdown = document.getElementById('user-dropdown');
-
-    // Verifica se os dois elementos existem na página
-    if (menuTrigger && dropdown) {
-        
-        // Adiciona um "escutador" de clique no gatilho do menu ("Olá, nome")
-        menuTrigger.addEventListener('click', (event) => {
-            // Impede que o clique se propague para outros elementos
-            event.stopPropagation();
-            
-            // Mostra ou esconde o menu dropdown
-            dropdown.classList.toggle('hidden');
-        });
-    }
-});
-
-// Adiciona um "escutador" de clique na janela inteira
-window.addEventListener('click', (event) => {
-    const dropdown = document.getElementById('user-dropdown');
-
-    // Se o dropdown estiver visível, esconde-o (efeito de fechar ao clicar fora)
-    if (dropdown && !dropdown.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
-    }
-});
