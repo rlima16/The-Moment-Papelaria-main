@@ -61,14 +61,12 @@
     </main>
     
     <footer id="contato">
-    <p>The Moment</p>
-    <p>Email: adm@themomentoficial.shop</p>
-    <p>Telefone: (11) 2050-4970</p>
-    <p>Atendimento: De Seg a Sex das 09h às 18h</p>
-  </footer>
+        <p>The Moment</p>
+        <p>Email: adm@themomentoficial.shop</p>
+        <p>Telefone: (11) 2050-4970</p>
+        <p>Atendimento: De Seg a Sex das 09h às 18h</p>
+    </footer>
 
-    <div id="auth-modal" class="auth-modal hidden">
-        </div>
     <div id="pix-instructions" class="pix-modal hidden">
         <div class="pix-box">
             <h2>Pagamento via PIX</h2>
@@ -76,10 +74,39 @@
             <p>Para confirmar, realize o pagamento no valor de <strong id="pix-value"></strong> para a chave abaixo:</p>
             <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/qr-code-pix.png?raw=true" alt="QR Code PIX" style="max-width: 200px; margin: 15px 0;">
             <p><strong>Chave PIX (E-mail):</strong></p>
-            <input type="text" id="pix-key" value="shop.themomentofficial@gmail.com" readonly>
+            <input type="text" id="pix-key" value="adm@themomentoficial.shop" readonly>
             <button class="btn" onclick="copyPixKey()">Copiar Chave</button>
             <p style="margin-top: 20px;">Após o pagamento, seu pedido será processado.</p>
             <a href="index.html" style="font-size: 14px; color: #555;">Voltar à Loja</a>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="auth-modal hidden" role="dialog" aria-modal="true">
+        <div class="auth-box">
+            <span class="auth-close" onclick="closeAuthModal()" aria-label="Fechar">&times;</span>
+            <div id="login-view">
+                <h2>Login</h2>
+                <form id="login-form" autocomplete="on">
+                    <input type="email" id="login-email" placeholder="E-mail" required />
+                    <input type="password" id="login-password" placeholder="Senha" required minlength="6" />
+                    <button type="submit" class="btn">Entrar</button>
+                    <p id="login-error" class="error-message hidden" role="alert"></p>
+                </form>
+                <p class="auth-switch" style="text-align: right; margin-top: -5px; font-size: 13px;">
+                    <a href="#" id="forgot-password-link">Esqueci a senha</a>
+                </p>
+                <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
+            </div>
+            <div id="register-view" class="hidden">
+                <h2>Cadastre-se</h2>
+                <form id="signup-form" autocomplete="on">
+                    <input type="email" id="signup-email" placeholder="E-mail" required />
+                    <input type="password" id="signup-password" placeholder="Senha (mínimo 6 caracteres)" required minlength="6" />
+                    <button type="submit" class="btn">Criar Conta</button>
+                    <p id="signup-error" class="error-message hidden" role="alert"></p>
+                </form>
+                <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginView(); return false;">Faça Login</a></p>
+            </div>
         </div>
     </div>
 
