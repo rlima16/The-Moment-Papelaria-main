@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Conta - The Moment</title>
+    <title>Detalhes do Produto - The Moment</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -11,7 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
-<body class="account-page-body"> <header class="main-header">
+<body class="product-detail-body">
+
+    <header class="main-header">
         <div class="header-logo">
             <a href="index.html">
                 <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
@@ -53,48 +55,54 @@
         </nav>
     </div>
 
-    <main class="account-page-container">
-        <a href="produtos.html" class="btn btn-secondary" style="width:auto; padding:10px 25px; margin-bottom:20px; display: inline-block;">‹ Voltar à Loja</a>
-        <h1>Minha Conta</h1>
-        <p id="welcome-message">Carregando informações...</p>
-        <h2>Seu Histórico de Pedidos</h2>
-        <div id="order-history-container">
+    <main class="product-detail-page">
+        <p id="loading-message">Carregando produto...</p>
+        
+        <div id="product-detail-container" class="hidden">
+            <div class="product-image-gallery">
+                <img id="product-image" src="" alt="Imagem do produto">
             </div>
-        <p id="no-orders-message" class="hidden">Você ainda não fez nenhum pedido.</p>
+            <div class="product-info">
+                <h1 id="product-title">Nome do Produto</h1>
+                <p id="product-price" class="price">R$ 0,00</p>
+                
+                <h2>Descrição</h2>
+                <p class="product-description">
+                    📌 ATENÇÃO! ESTE É UM ARQUIVO DIGITAL PARA CORTE NA SILHOUETTE 📌
+                    </p>👉 Nenhum item físico será enviado pelos Correios.</p>
+                    </p>O cliente é responsável por baixar, imprimir e cortar o arquivo utilizando sua máquina de corte compatível.</p>
+                    </p> 📂 Informações sobre o arquivo: </p>
+                    </p> Formato: .STUDIO3 </p>
+                    </p> Compatibilidade: Exclusivo para uso no programa Silhouette Studio. </p>
+                    </p> Observação: Não realizamos conversões de formato, alterações na arte ou personalizações. </p>
+                    </p> Compatibilidade: Exclusivo para uso no programa Silhouette Studio. </p>
+                </p>⚠️ Importante: Nossos arquivos não são compatíveis com edição em smartphones.</p>
+                </p>🔧 Suporte e responsabilidade do cliente: O cliente deve possuir conhecimento prévio sobre como abrir, editar (quando aplicável) e utilizar o arquivo em sua máquina de corte.</p>
+            </p> ℹ️ Observações finais: </p>
+            </p> Leia atentamente todas as informações antes de efetuar sua compra. </p>
+            </p> Tire todas as suas dúvidas previamente para garantir que o produto atende à sua necessidade. </p>
+            </p> 🙏 Obrigada pela confiança e boas criações! </p>
+                
+                <button id="add-to-cart-btn" class="btn">Adicionar ao Carrinho</button>
+            </div>
+        </div>
     </main>
     
     <footer id="contato">
-    <p>The Moment</p>
-    <p>Email: adm@themomentoficial.shop</p>
-    <p>Telefone: (11) 2050-4970</p>
-    <p>Atendimento: De Seg a Sex das 09h às 18h</p>
-
-      <div class="social-icons">
-    <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-        <i class="fab fa-instagram"></i>
-    </a>
-
-    <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    
-    <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" aria-label="Shopee">
-        <i class="fas fa-store"></i>
-    </a>
-<div class="copyright-footer">
-    <p>Copyright The Moment - 2025. Todos os direitos reservados.</p>
-    <p>Desenvolvido por: Rodrigo Lima</p>
-</div>
-
-</div>
-</footer>
-</footer>
+        <p>The Moment</p>
+        <p>Email: adm@themomentoficial.shop</p>
+        <p>Telefone: (11) 2050-4970</p>
+        <div class="copyright-footer">
+            <p>Copyright The Moment - 2025. Todos os direitos reservados.</p>
+            <p>Desenvolvido por: Rodrigo Lima</p>
+        </div>
+    </footer>
 
     <div id="auth-modal" class="auth-modal hidden">
         </div>
 
     <script type="module" src="firebase-auth.js"></script>
     <script type="module" src="shared-functions.js"></script>
-    <script type="module" src="account-page.js"></script>
+    <script type="module" src="produto-detalhe.js"></script>
 </body>
 </html>
