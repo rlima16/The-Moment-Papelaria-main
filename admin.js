@@ -7,29 +7,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Escuta o evento de "submit" (envio) do formulário
     addProductForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Impede que a página recarregue
+    event.preventDefault();
 
-        // Pega os valores dos campos do formulário
-        const name = document.getElementById('product-name').value;
-        const price = parseFloat(document.getElementById('product-price').value);
-        const imageUrl = document.getElementById('product-image-url').value;
+    const name = document.getElementById('product-name').value;
+    const price = parseFloat(document.getElementById('product-price').value);
+    const imageUrl = document.getElementById('product-image-url').value;
 
-        // Monta o objeto do novo produto
-        const newProduct = {
-            title: name,
-            price: price,
-            image: imageUrl,
-            // Poderíamos adicionar outros campos aqui no futuro, como 'featured'
-        };
+    if (!name || isNaN(price) || !imageUrl) {
+        alert("Por favor, preencha todos os campos corretamente.");
+        return;
+    }
 
-        try {
-            // Tenta adicionar o novo produto à coleção "products" no Firestore
-            const docRef = await addDoc(collection(db, "products"), newProduct);
-            alert(`Produto "${name}" adicionado com sucesso!`);
-            addProductForm.reset(); // Limpa o formulário
-        } catch (error) {
-            console.error("Erro ao adicionar produto: ", error);
-            alert("Ocorreu um erro ao adicionar o produto. Tente novamente.");
-        }
+    // --- NOVA LÓGICA DE PALAVRAS-CHAVE ---
+    // 1. Deixa o título em letras minúsculas e remove acentos
+    const normalizedTitle = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // 2. Quebra o título em um array de palavras
+    const keywords = normalizedTitle.split(' ');
+    // --- FIM DA NOVA LÓGICA ---
+
+    const newProduct = {
+        title: name,
+        price: price,
+        image: imageUrl,
+        keywords: keywords // 3. Salva o array de palavras-chave no produto
+    };
+
+    try {
+        const docRef = await addDoc(collection(db, "products"), newProduct);
+        alert(`Produto "${name}" adicionado com sucesso!`);
+        addProductForm.reset();
+    } catch (error) {
+        console.error("Erro ao adicionar produto: ", error);
+        alert("Ocorreu um erro ao adicionar o produto. Tente novamente.");
+    }
     });
 });

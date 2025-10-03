@@ -885,3 +885,105 @@ footer p {
     background-color: transparent;
     cursor: not-allowed; /* Cursor de "não permitido" */
 }
+
+/* --- ÍCONES SOCIAIS NO RODAPÉ --- */
+.social-icons {
+    margin-top: 20px;
+}
+
+.social-icons a {
+    font-size: 24px;
+    color: #471a31; /* Mesma cor do texto do rodapé */
+    margin: 0 10px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #fff; /* Cor ao passar o mouse */
+}
+
+/* --- SEÇÃO DO INSTAGRAM --- */
+.instagram-section {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #fafafa; /* Um fundo levemente diferente para destacar */
+}
+
+.instagram-section h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.instagram-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    max-width: 1000px;
+    margin: 30px auto 0 auto;
+}
+
+.instagram-grid a {
+    display: block;
+    overflow: hidden; /* Garante que a imagem não saia do container */
+    border-radius: 8px;
+}
+
+.instagram-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
+    transition: transform 0.4s ease;
+}
+
+.instagram-grid a:hover img {
+    transform: scale(1.1); /* Efeito de zoom suave ao passar o mouse */
+}
+
+/* --- AJUSTE FINAL DA PAGINAÇÃO DO CARROSSEL --- */
+
+/* 1. Adiciona um preenchimento na parte de baixo do carrossel para criar espaço */
+.swiper {
+    padding-bottom: 30px !important; /* Cria 30px de espaço extra embaixo */
+}
+
+/* 2. Reposiciona as bolinhas dentro desse novo espaço */
+.swiper-pagination {
+    bottom: 0px !important; /* "Cola" as bolinhas na base do novo espaço */
+}
+
+/* --- SEÇÃO DE FEEDBACKS (DEPOIMENTOS) --- */
+
+.testimonial-section {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #fafafa; /* Fundo levemente diferente */
+}
+
+.testimonial-section h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 36px;
+    margin-bottom: 50px;
+}
+
+.testimonialSwiper {
+    width: 100%;
+    padding-bottom: 40px !important; /* Espaço para as bolinhas de paginação */
+}
+
+.testimonialSwiper .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.testimonialSwiper .swiper-slide img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    object-fit: contain; /* <-- ADICIONE ESTA LINHA */
+}
