@@ -1323,3 +1323,99 @@ footer p {
     transform: translateY(-50%);
     pointer-events: none; /* Permite que o clique passe para o <select> */
 }
+
+/* --- ESTILOS DO PAINEL DE ADMINISTRAÇÃO --- */
+.admin-panel {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-nav {
+    width: 250px;
+    background-color: #fce4ec; /* Rosa bem claro */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-nav-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-nav-header img {
+    max-width: 100px;
+    margin-bottom: 10px;
+}
+
+.admin-nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-nav li button {
+    width: 100%;
+    padding: 15px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.admin-nav li button:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.admin-nav li button.active {
+    background-color: #ff69b4; /* Cor rosa principal */
+    color: white;
+}
+
+.admin-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #fafafa;
+}
+
+/* Estilos para a lista de gerenciamento de produtos */
+.product-manage-list {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.product-manage-list th, .product-manage-list td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.product-manage-list th {
+    background-color: #f2f2f2;
+}
+
+.product-manage-list img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-actions button {
+    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-edit { background-color: #ffc107; color: white; }
+.btn-delete { background-color: #f44336; color: white; }
