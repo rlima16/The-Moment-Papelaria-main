@@ -1187,3 +1187,85 @@ footer p {
 .image-grid a:hover img {
     transform: scale(1.1); /* Efeito de zoom suave ao passar o mouse */
 }
+
+/* --- DESIGN RESPONSIVO PARA CELULAR --- */
+/* As regras abaixo só se aplicam a telas com 768px de largura ou menos */
+
+@media (max-width: 768px) {
+
+    /* --- AJUSTES GERAIS --- */
+    body {
+        font-size: 14px; /* Diminui a fonte base um pouco */
+    }
+
+    /* --- CABEÇALHO --- */
+    .main-header {
+        grid-template-columns: 1fr 1fr; /* Muda para 2 colunas: logo na esquerda, ações na direita */
+        padding: 10px 15px; /* Diminui o espaçamento lateral */
+        gap: 15px;
+    }
+
+    .search-nav-container {
+        padding: 15px 0;
+    }
+    
+    .header-search {
+        grid-column: 1 / -1; /* Faz a busca ocupar a largura total em uma nova linha */
+        order: 3; /* Coloca a busca por último no fluxo */
+        max-width: 90%; /* Ajusta a largura para a tela */
+    }
+
+    .action-text {
+        font-size: 12px; /* Diminui a fonte do texto do cabeçalho */
+    }
+    
+    .action-item i {
+        font-size: 20px; /* Diminui o tamanho dos ícones */
+    }
+    
+    .header-logo img {
+        height: 45px; /* Diminui o logo */
+        transform: scale(1); /* Remove o efeito de escala no celular */
+    }
+
+    /* --- NAVEGAÇÃO E TÍTULOS --- */
+    .secondary-nav a {
+        font-size: 14px;
+        padding: 6px 12px;
+        margin: 0 5px;
+    }
+    
+    h1, .welcome-text h1, .testimonial-section h2, .instagram-section h2 {
+        font-size: 28px; /* Diminui o tamanho dos títulos principais */
+    }
+
+    /* --- GRADES DE PRODUTOS E IMAGENS --- */
+    .grid {
+        /* Muda a grade de produtos para 2 colunas no celular */
+        grid-template-columns: 1fr 1fr; 
+        gap: 15px;
+    }
+
+    .image-gallery, .instagram-grid, .shopee-gallery {
+        /* Também muda as galerias para 2 colunas */
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    /* --- PÁGINAS ESPECÍFICAS --- */
+    .product-detail-page, .cart-page-container, .account-page-container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    #product-detail-container {
+        grid-template-columns: 1fr; /* Na página de detalhes, coloca a imagem em cima do texto */
+    }
+
+    /* --- RODAPÉ --- */
+    .copyright-footer {
+        flex-direction: column; /* Coloca o copyright em cima dos créditos */
+        gap: 10px;
+        text-align: center;
+    }
+}
