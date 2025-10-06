@@ -1269,3 +1269,57 @@ footer p {
         text-align: center;
     }
 }
+
+/* --- ESTILO DO MENU DE ORDENAÇÃO --- */
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end; /* Alinha o menu à direita */
+    margin-bottom: 20px;
+}
+
+.sort-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-container label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #555;
+}
+
+#sort-options {
+    /* Remove a aparência padrão */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Remove a seta padrão no IE */
+    &::-ms-expand {
+        display: none;
+    }
+
+    /* Estilos personalizados */
+    background-color: #fff;
+    padding: 8px 30px 8px 15px; /* Espaço para a seta personalizada */
+    border: 1px solid #ff69b4;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    color: #333;
+    cursor: pointer;
+}
+
+/* Cria uma seta personalizada */
+.sort-container::after {
+    content: '▼';
+    font-size: 12px;
+    color: #ff69b4;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Permite que o clique passe para o <select> */
+}
