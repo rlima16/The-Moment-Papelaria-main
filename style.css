@@ -595,6 +595,20 @@ footer p {
     text-align: center;
 }
 
+
+.shopee-gallery img {
+    width: 100%; /* MUDANÇA 2: Ocupa 100% da célula do grid */
+    height: 100%; /* Ocupa 100% da célula do grid */
+    object-fit: cover; /* Garante que a imagem preencha o espaço */
+    border-radius: 8px; /* Mesmo arredondamento */
+    transition: transform 0.4s ease;
+}
+
+/* Adiciona o mesmo efeito de hover */
+.shopee-gallery a:hover img {
+    transform: scale(1.1);
+}
+
 /* --- BOTÃO DA SHOPEE (ESTILO CORRIGIDO) --- */
 
 .shopee-bar {
@@ -923,13 +937,6 @@ footer p {
     margin-bottom: 10px;
 }
 
-.instagram-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    max-width: 1000px;
-    margin: 30px auto 0 auto;
-}
 
 .instagram-grid a {
     display: block;
@@ -1150,4 +1157,33 @@ footer p {
 /* DEPOIS (CORRIGIDO) */
 .product-detail-body .header-search {
     display: none;
+}
+
+/* --- ESTILO UNIFICADO PARA GALERIAS DE IMAGEM --- */
+
+.image-grid {
+    display: grid;
+    /* Cria um grid responsivo com colunas de no mínimo 200px */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    max-width: 1000px;
+    margin: 30px auto 0 auto;
+}
+
+.image-grid a {
+    display: block;
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 0 / 1; /* Força o formato das imagens a ser um quadrado perfeito */
+}
+
+.image-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer */
+    transition: transform 0.4s ease;
+}
+
+.image-grid a:hover img {
+    transform: scale(1.1); /* Efeito de zoom suave ao passar o mouse */
 }
