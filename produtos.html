@@ -67,16 +67,17 @@
     <h1>Todos os Nossos Produtos</h1>
 
     <div class="toolbar">
-    <div class="sort-container">
-        <label for="sort-options">Ordenar por:</label>
-        <select id="sort-options">
-            <option value="title-asc">Nome (A-Z)</option>
-            <option value="title-desc">Nome (Z-A)</option>
-            <option value="price-asc">Preço (Menor para Maior)</option>
-            <option value="price-desc">Preço (Maior para Menor)</option>
-        </select>
+        <div class="sort-container">
+            <label for="sort-options">Ordenar por:</label>
+            <select id="sort-options">
+                <option value="title-asc">Nome (A-Z)</option>
+                <option value="title-desc">Nome (Z-A)</option>
+                <option value="price-asc">Preço (Menor para Maior)</option>
+                <option value="price-desc">Preço (Maior para Menor)</option>
+            </select>
+        </div>
+        <button id="clear-sort-btn" class="btn" style="width: auto; padding: 8px 15px; font-size: 14px; display: none;">Limpar Filtros</button>
     </div>
-</div>
     
     <div id="all-products-list" class="grid">
         </div>
@@ -85,6 +86,7 @@
         <button id="prev-page-btn" class="btn btn-secondary">‹ Página Anterior</button>
         <button id="next-page-btn" class="btn btn-secondary">Próxima Página ›</button>
     </div>
+
 </main>
 
     <footer id="contato">

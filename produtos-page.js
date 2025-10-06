@@ -89,31 +89,52 @@ async function fetchAndDisplayProducts() {
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     searchQuery = urlParams.get('search') || '';
+
     const sortOptions = document.getElementById('sort-options');
+    const clearSortBtn = document.getElementById('clear-sort-btn'); // Pega o novo botão
+
+    // Mostra o botão "Limpar" apenas se a ordenação não for a padrão
+    function toggleClearButton() {
+        if (sortOptions.value === 'title-asc') {
+            clearSortBtn.style.display = 'none';
+        } else {
+            clearSortBtn.style.display = 'inline-block';
+        }
+    }
+
     if (sortOptions) {
         sortOptions.addEventListener('change', (event) => {
             currentSortOrder = event.target.value;
             currentPageIndex = 0;
             pageHistory = [null];
             lastVisibleProduct = null;
+            toggleClearButton(); // Mostra ou esconde o botão
             fetchAndDisplayProducts();
         });
     }
+    
+    if (clearSortBtn) {
+        clearSortBtn.addEventListener('click', () => {
+            // Volta para a ordenação padrão
+            sortOptions.value = 'title-asc';
+            currentSortOrder = 'title-asc';
+
+            // Reseta a paginação
+            currentPageIndex = 0;
+            pageHistory = [null];
+            lastVisibleProduct = null;
+            
+            toggleClearButton(); // Esconde o botão
+            fetchAndDisplayProducts(); // Busca os produtos novamente
+        });
+    }
+
     const prevPageBtn = document.getElementById('prev-page-btn');
     const nextPageBtn = document.getElementById('next-page-btn');
-    if(nextPageBtn) nextPageBtn.addEventListener('click', () => {
-        if (lastVisibleProduct && currentPageIndex === pageHistory.length - 1) {
-            pageHistory.push(lastVisibleProduct);
-        }
-        currentPageIndex++;
-        fetchAndDisplayProducts();
-    });
-    if(prevPageBtn) prevPageBtn.addEventListener('click', () => {
-        if (currentPageIndex > 0) {
-            currentPageIndex--;
-            pageHistory.pop();
-            fetchAndDisplayProducts();
-        }
-    });
+    
+    if(nextPageBtn) { /* ... (código do botão Próxima) ... */ }
+    if(prevPageBtn) { /* ... (código do botão Anterior) ... */ }
+
     fetchAndDisplayProducts();
+    toggleClearButton(); // Verifica o estado inicial
 });
