@@ -38,7 +38,23 @@
                         <input type="text" id="product-image-url" required>
                     </div>
                     <div class="form-group">
-                        <label><input type="checkbox" id="product-featured"> Marcar como Destaque (aparece no carrossel)</label>
+                        <label for="product-category">Categoria</label>
+                        <select id="product-category" required>
+    <option value="" disabled selected>Selecione uma categoria</option>
+    <option value="Herois">Heróis</option>
+    <option value="Princesas">Princesas</option>
+    <option value="Anime">Anime</option>
+    <option value="Cha de Bebe">Chá de Bebê</option>
+    <option value="Jogos">Jogos</option>
+    <option value="Disney">Disney</option>
+    <option value="Turma da Monica">Turma da Mônica</option>
+    <option value="Desenhos">Desenhos</option>
+    <option value="Carros">Carros</option>
+    <option value="Diversos">Diversos</option>
+</select>
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="product-featured"> Marcar como Destaque</label>
                     </div>
                     <button type="submit" class="btn">Adicionar Produto</button>
                 </form>
@@ -46,12 +62,10 @@
 
             <div id="manage-products-view" class="hidden">
                 <h1>Gerenciar Produtos</h1>
-                <div id="products-list-container">
-                    </div>
+                <div id="products-list-container"></div>
             </div>
         </main>
     </div>
-
     <script type="module" src="admin.js"></script>
 </body>
 </html>

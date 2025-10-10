@@ -1,15 +1,14 @@
-// produtos-page.js (VERSÃO COMPLETA COM BUSCA, PAGINAÇÃO E ORDENAÇÃO)
-
 import { db } from './firebase-auth.js';
 import { collection, query, orderBy, limit, getDocs, startAfter, where } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-const productsPerPage = 20;
+let productsPerPage = 20;
 let lastVisibleProduct = null;
 let pageHistory = [null];
 let currentPageIndex = 0;
 let isFetching = false;
 let searchQuery = '';
-let currentSortOrder = 'title-asc'; // Ordenação padrão
+let currentSortOrder = 'title-asc';
+let selectedCategory = null;
 
 async function fetchAndDisplayProducts() {
     if (isFetching) return;
@@ -27,7 +26,7 @@ async function fetchAndDisplayProducts() {
 
     try {
         let finalQuery;
-
+        
         if (searchQuery) {
             if (toolbar) toolbar.style.display = 'none';
             if (paginationControls) paginationControls.style.display = 'none';
@@ -35,10 +34,10 @@ async function fetchAndDisplayProducts() {
             const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term);
             finalQuery = query(collection(db, "products"), where("keywords", "array-contains-any", searchTerms));
         } else {
-            if (toolbar) toolbar.style.display = 'flex'; // Usamos flex para alinhar
+            if (toolbar) toolbar.style.display = 'flex';
             if (paginationControls) paginationControls.style.display = 'block';
             pageTitle.textContent = 'Todos os Nossos Produtos';
-
+            
             const startAtDoc = pageHistory[currentPageIndex];
             
             let sortField = 'title';
@@ -47,7 +46,12 @@ async function fetchAndDisplayProducts() {
             else if (currentSortOrder === 'price-asc') { sortField = 'price'; } 
             else if (currentSortOrder === 'price-desc') { sortField = 'price'; sortDirection = 'desc'; }
             
-            const baseQuery = query(collection(db, "products"), orderBy(sortField, sortDirection));
+            let baseQuery;
+            if (selectedCategory) {
+                baseQuery = query(collection(db, "products"), where("category", "==", selectedCategory), orderBy(sortField, sortDirection));
+            } else {
+                baseQuery = query(collection(db, "products"), orderBy(sortField, sortDirection));
+            }
             
             if (startAtDoc) {
                 finalQuery = query(baseQuery, startAfter(startAtDoc), limit(productsPerPage));
@@ -59,7 +63,6 @@ async function fetchAndDisplayProducts() {
         const querySnapshot = await getDocs(finalQuery);
         const products = [];
         querySnapshot.forEach((doc) => { products.push({ id: doc.id, ...doc.data() }); });
-
         productsList.innerHTML = '';
         lastVisibleProduct = querySnapshot.docs[querySnapshot.docs.length - 1];
 
@@ -86,55 +89,69 @@ async function fetchAndDisplayProducts() {
     }
 }
 
+async function createCategoryFilters() {
+    const filtersContainer = document.getElementById('category-filters');
+    if (!filtersContainer) return;
+    try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        const categories = new Set();
+        querySnapshot.forEach((doc) => {
+            if (doc.data().category) { categories.add(doc.data().category); }
+        });
+        filtersContainer.innerHTML = '';
+        const allButton = document.createElement('button');
+        allButton.textContent = 'Ver Todos';
+        allButton.classList.add('active');
+        allButton.addEventListener('click', () => { handleCategoryClick(null, allButton); });
+        filtersContainer.appendChild(allButton);
+        categories.forEach(category => {
+            const button = document.createElement('button');
+            button.textContent = category;
+            button.addEventListener('click', () => { handleCategoryClick(category, button); });
+            filtersContainer.appendChild(button);
+        });
+    } catch (error) {
+        console.error("Erro ao criar filtros de categoria:", error);
+    }
+}
+
+function handleCategoryClick(category, clickedButton) {
+    selectedCategory = category;
+    currentPageIndex = 0;
+    pageHistory = [null];
+    lastVisibleProduct = null;
+    document.querySelectorAll('#category-filters button').forEach(btn => btn.classList.remove('active'));
+    clickedButton.classList.add('active');
+    fetchAndDisplayProducts();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     searchQuery = urlParams.get('search') || '';
-
+    
     const sortOptions = document.getElementById('sort-options');
-    const clearSortBtn = document.getElementById('clear-sort-btn'); // Pega o novo botão
-
-    // Mostra o botão "Limpar" apenas se a ordenação não for a padrão
-    function toggleClearButton() {
-        if (sortOptions.value === 'title-asc') {
-            clearSortBtn.style.display = 'none';
-        } else {
-            clearSortBtn.style.display = 'inline-block';
-        }
-    }
-
     if (sortOptions) {
         sortOptions.addEventListener('change', (event) => {
             currentSortOrder = event.target.value;
-            currentPageIndex = 0;
-            pageHistory = [null];
-            lastVisibleProduct = null;
-            toggleClearButton(); // Mostra ou esconde o botão
+            currentPageIndex = 0; pageHistory = [null]; lastVisibleProduct = null;
             fetchAndDisplayProducts();
         });
     }
     
-    if (clearSortBtn) {
-        clearSortBtn.addEventListener('click', () => {
-            // Volta para a ordenação padrão
-            sortOptions.value = 'title-asc';
-            currentSortOrder = 'title-asc';
-
-            // Reseta a paginação
-            currentPageIndex = 0;
-            pageHistory = [null];
-            lastVisibleProduct = null;
-            
-            toggleClearButton(); // Esconde o botão
-            fetchAndDisplayProducts(); // Busca os produtos novamente
-        });
-    }
-
     const prevPageBtn = document.getElementById('prev-page-btn');
     const nextPageBtn = document.getElementById('next-page-btn');
-    
-    if(nextPageBtn) { /* ... (código do botão Próxima) ... */ }
-    if(prevPageBtn) { /* ... (código do botão Anterior) ... */ }
+    if(nextPageBtn) nextPageBtn.addEventListener('click', () => {
+        if (lastVisibleProduct && currentPageIndex === pageHistory.length - 1) { pageHistory.push(lastVisibleProduct); }
+        currentPageIndex++;
+        fetchAndDisplayProducts();
+    });
+    if(prevPageBtn) prevPageBtn.addEventListener('click', () => {
+        if (currentPageIndex > 0) {
+            currentPageIndex--; pageHistory.pop();
+            fetchAndDisplayProducts();
+        }
+    });
 
+    createCategoryFilters();
     fetchAndDisplayProducts();
-    toggleClearButton(); // Verifica o estado inicial
 });

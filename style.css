@@ -1419,3 +1419,72 @@ footer p {
 
 .btn-edit { background-color: #ffc107; color: white; }
 .btn-delete { background-color: #f44336; color: white; }
+
+/* --- ESTILO ADICIONAL PARA O FORMULÁRIO ADMIN --- */
+
+/* Estiliza o menu dropdown de Categoria */
+#add-product-form select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+}
+
+/* Ajusta o alinhamento do "Marcar como Destaque" */
+#add-product-form .form-group input[type="checkbox"] {
+    margin: 0; /* Remove a margem padrão */
+    width: 18px; /* Define um tamanho para a caixa */
+    height: 18px;
+}
+
+/* Garante que o texto fique ao lado do checkbox */
+#add-product-form .form-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaço entre a caixa e o texto */
+    font-weight: normal; /* Deixa a fonte do label normal, mais delicada */
+}
+
+/* Garante que o texto dos labels principais continue em cima */
+#add-product-form .form-group label[for] {
+    display: block;
+    font-weight: 600;
+}
+
+/* --- ESTILO DOS FILTROS DE CATEGORIA --- */
+.category-filters-container {
+    text-align: center;
+    margin: 20px 0 30px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.category-filters-container button {
+    background-color: transparent;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-filters-container button:hover {
+    background-color: #fce4ec;
+    border-color: #fce4ec;
+    color: #471a31;
+}
+
+.category-filters-container button.active {
+    background-color: #ff69b4;
+    border-color: #ff69b4;
+    color: #fff;
+}
