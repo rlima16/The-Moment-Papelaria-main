@@ -14,54 +14,45 @@
 <body>
       <header class="main-header">
     <div class="header-logo">
-      <a href="index.html">
-        <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
-      </a>
+        <a href="index.html">
+            <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
+        </a>
     </div>
 
     <div class="header-search">
-      <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
-      <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
+        <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
+        <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
     </div>
 
-<div class="header-user-actions">
-
-    <div class="action-item" id="user-actions-container">
-        <i class="fa-regular fa-user"></i>
-        <div class="action-text">
-
-            <a href="#" id="auth-link">Login | Cadastre-se</a>
-
-            <div id="user-menu-trigger" class="hidden" style="cursor: pointer;">
-                <span id="user-info"></span>
+    <div class="header-user-actions">
+        <div class="action-item" id="user-actions-container">
+            <i class="fa-regular fa-user"></i>
+            <div class="action-text">
+                <a href="#" id="auth-link">Login | Cadastre-se</a>
+                <div id="user-menu-trigger" class="hidden">
+                    <span id="user-info"></span>
+                </div>
             </div>
-
+        </div>
+        <div id="user-dropdown" class="dropdown-content hidden">
+            <a href="minha-conta.html">Minha Conta</a>
+            <a href="#" id="logout-link">Sair</a>
+        </div>
+        <div class="action-item">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <div class="action-text">
+                <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
+                <span id="cart-total-value">R$ 0,00</span>
+            </div>
         </div>
     </div>
+</header>
 
-    <div id="user-dropdown" class="dropdown-content hidden">
-        <a href="minha-conta.html">Minha Conta</a>
-        <a href="#" id="logout-link">Sair</a>
-    </div>
-
-
-    <div class="action-item">
-        <i class="fa-solid fa-bag-shopping"></i>
-        <div class="action-text">
-            <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
-            <span id="cart-total-value">R$ 0,00</span>
-        </div>
-    </div>
-
-</div>
-
-  </header>
-
-    <nav class="secondary-nav">
-        <a href="index.html">Página Inicial</a>
-        <a href="produtos.html" class="active">Produtos</a>
-        <a href="index.html#contato">Contato</a>
-    </nav>
+<nav class="secondary-nav">
+    <a href="index.html">Página Inicial</a>
+    <a href="produtos.html">Produtos</a>
+    <a href="#contato">Contato</a>
+</nav>
 
     <main class="produtos" style="margin-top: 0; min-height: 70vh;">
     <h1>Todos os Nossos Produtos</h1>
@@ -150,9 +141,14 @@
         </div>
     </div>
 
-<a href="https://wa.me/551120504970" class="whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer">
-    <i class="fab fa-whatsapp"></i>
-</a>
+<div class="floating-buttons-container">
+    <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" class="floating-btn instagram-float" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <i class="fab fa-instagram"></i>
+    </a>
+    <a href="https://wa.me/551120504970" class="floating-btn whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</div>
 
 <script type="module" src="products-data.js"></script>
 <script type="module" src="firebase-auth.js"></script>

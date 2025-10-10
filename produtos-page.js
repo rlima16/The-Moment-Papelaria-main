@@ -10,6 +10,42 @@ let searchQuery = '';
 let currentSortOrder = 'title-asc';
 let selectedCategory = null;
 
+// <-- AJUSTE AQUI 1: Adicionamos a função da animação "Fly to Cart" -->
+function handleFlyToCart(event) {
+    const button = event.currentTarget;
+    const card = button.closest('.card');
+    if (!card) return;
+
+    const productImage = card.querySelector('img');
+    const cartIcon = document.getElementById('cart-link-header');
+    if (!productImage || !cartIcon) return;
+
+    const imgClone = productImage.cloneNode(true);
+    imgClone.classList.add('flying-product-img');
+    
+    const productRect = productImage.getBoundingClientRect();
+    const cartRect = cartIcon.getBoundingClientRect();
+
+    document.body.appendChild(imgClone);
+    imgClone.style.top = `${productRect.top}px`;
+    imgClone.style.left = `${productRect.left}px`;
+    imgClone.style.width = `${productRect.width}px`;
+    imgClone.style.height = `${productRect.height}px`;
+
+    requestAnimationFrame(() => {
+        imgClone.style.top = `${cartRect.top + (cartRect.height / 2)}px`;
+        imgClone.style.left = `${cartRect.left + (cartRect.width / 2)}px`;
+        imgClone.style.width = '25px';
+        imgClone.style.height = '25px';
+        imgClone.style.opacity = '0';
+    });
+
+    setTimeout(() => {
+        imgClone.remove();
+    }, 1000); // Duração da animação (1s), deve ser a mesma do seu CSS
+}
+
+
 async function fetchAndDisplayProducts() {
     if (isFetching) return;
     isFetching = true;
@@ -72,8 +108,28 @@ async function fetchAndDisplayProducts() {
             products.forEach(product => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `<a href="produto-detalhe.html?id=${product.id}" class="card-link"><img src="${product.image}" alt="${product.title}"><h3>${product.title}</h3></a><p>R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p><button class="btn">Adicionar ao Carrinho</button>`;
-                card.querySelector('button').addEventListener('click', (event) => window.addToCart(event, product));
+                
+                // <-- AJUSTE AQUI 2: Adicionamos a classe 'add-to-cart-btn' ao botão -->
+                card.innerHTML = `
+                    <a href="produto-detalhe.html?id=${product.id}" class="card-link">
+                        <img src="${product.image}" alt="${product.title}">
+                        <h3>${product.title}</h3>
+                    </a>
+                    <p>R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
+                    <button class="btn add-to-cart-btn">Adicionar ao Carrinho</button>
+                `;
+                
+                // <-- AJUSTE AQUI 3: Modificamos o evento de clique para também chamar a animação -->
+                const addToCartButton = card.querySelector('.add-to-cart-btn');
+                addToCartButton.addEventListener('click', (event) => {
+                    // Mantém sua lógica original de adicionar ao carrinho
+                    if(window.addToCart) {
+                       window.addToCart(event, product);
+                    }
+                    // Dispara a animação
+                    handleFlyToCart(event);
+                });
+
                 productsList.appendChild(card);
             });
         }
