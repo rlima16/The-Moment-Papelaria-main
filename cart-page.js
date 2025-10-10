@@ -72,7 +72,7 @@ function renderPixPaymentView() {
             <p><strong>Chave PIX (E-mail):</strong></p>
             
             <div>
-                <input type="text" id="pix-key" value="shop.themomentofficial@gmail.com" readonly>
+                <input type="text" id="pix-key" value="adm@themomentoficial.shop" readonly>
                 <button class="btn" onclick="copyPixKey()">Copiar Chave</button>
             </div>
             
