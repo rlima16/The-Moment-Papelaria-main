@@ -796,45 +796,73 @@ footer p {
     color: #471a31;
 }
 
-/* --- BOTÃO FLUTUANTE DO WHATSAPP COM TOOLTIP --- */
+/* --- BOTÕES FLUTUANTES (WHATSAPP E INSTAGRAM) --- */
 
-.whatsapp-float {
-    position: fixed; /* Mantém o botão fixo na tela */
+/* O contêiner que segura e posiciona os dois botões */
+.floating-buttons-container {
+    position: fixed;
     bottom: 25px;
     right: 25px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column; /* Coloca um botão em cima do outro */
+    gap: 15px; /* Espaço entre os botões */
+}
+
+/* 1. Estilo BASE que se aplica a AMBOS os botões */
+.floating-btn {
     width: 60px;
     height: 60px;
-    background-color: #25D366;
     color: #FFF;
     border-radius: 50%;
-    text-align: center;
-    font-size: 30px;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
-    z-index: 100;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 30px;
     text-decoration: none;
     transition: all 0.3s ease;
+    
+    /* Começam escondidos */
     opacity: 0;
     visibility: hidden;
     transform: translateY(20px);
 }
 
-.whatsapp-float:hover {
-    transform: translateY(-5px);
-    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.whatsapp-float.show {
+/* Classe 'show' que o JS usa para mostrar os botões */
+.floating-btn.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-/* Estilo do balão de texto (o "tooltip") */
+/* Efeito de "saltar" para AMBOS os botões */
+.floating-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 2. Cores e Tooltips ESPECÍFICOS de cada botão */
+
+/* WhatsApp */
+.whatsapp-float {
+    background-color: #25D366;
+}
 .whatsapp-float::before {
     content: "Entre em contato conosco";
+}
+
+/* Instagram */
+.instagram-float {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+}
+.instagram-float::before {
+    content: "Siga-nos no Instagram";
+}
+
+
+/* 3. Estilos do Tooltip que se aplicam a AMBOS os botões */
+.floating-btn::before {
     position: absolute;
     right: 75px;
     top: 50%;
@@ -848,10 +876,10 @@ footer p {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    pointer-events: none; /* Impede que o tooltip bloqueie o mouse */
 }
 
-/* Cria a "setinha" do balão de texto */
-.whatsapp-float::after {
+.floating-btn::after {
     content: "";
     position: absolute;
     right: 65px;
@@ -863,11 +891,11 @@ footer p {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    pointer-events: none;
 }
 
-/* Mostra o balão e a setinha quando o mouse passa por cima */
-.whatsapp-float:hover::before,
-.whatsapp-float:hover::after {
+.floating-btn:hover::before,
+.floating-btn:hover::after {
     opacity: 1;
     visibility: visible;
 }

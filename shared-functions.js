@@ -53,11 +53,27 @@ window.closeLightbox = function() {
     if (lb) lb.classList.add('hidden');
 };
 
-const whatsappBtn = document.getElementById('whatsapp-float-btn');
+// NO ARQUIVO shared-functions.js
+// SUBSTITUA A LÓGICA DO BOTÃO FLUTUANTE POR ESTA:
+
+// Pega TODOS os botões flutuantes
+const floatingBtns = document.querySelectorAll('.floating-btn');
+
+// Escuta o evento de rolagem da página
 window.addEventListener('scroll', () => {
-    if (whatsappBtn) {
-        if (window.scrollY > 200) { whatsappBtn.classList.add('show'); } 
-        else { whatsappBtn.classList.remove('show'); }
+    // Se encontrou botões
+    if (floatingBtns.length > 0) {
+        // Para cada botão encontrado...
+        floatingBtns.forEach(btn => {
+            // Se o usuário rolou mais de 200 pixels para baixo
+            if (window.scrollY > 200) {
+                // Mostra o botão
+                btn.classList.add('show');
+            } else {
+                // Esconde o botão
+                btn.classList.remove('show');
+            }
+        });
     }
 });
 
