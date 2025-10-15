@@ -1059,3 +1059,64 @@ footer p {
     transition: all 1s cubic-bezier(0.55, 0.055, 0.675, 0.19); /* Define a animação */
     object-fit: cover;
 }
+
+/* ============================================= */
+/* MELHORIA DO BOTÃO WHATSAPP           */
+/* ============================================= */
+
+/* --- 1. Definindo a Animação de Pulso --- */
+/* A gente cria a "receita" da animação que vamos usar. */
+@keyframes pulse {
+  0% {
+    /* Começa no tamanho normal, com uma sombra verde fraca */
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+  }
+  
+  70% {
+    /* Aumenta um pouco de tamanho e a sombra se expande e some */
+    transform: scale(1.05);
+    box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+  }
+  
+  100% {
+    /* Volta ao estado inicial para recomeçar o ciclo */
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+/* --- 2. Aumentando o Tamanho do Botão --- */
+/* Aqui a gente aumenta o botão e o ícone dele. */
+.floating-btn.whatsapp-float {
+  width: 60px;  /* Tamanho anterior era ~50px */
+  height: 60px; /* Tamanho anterior era ~50px */
+
+  /* --- 3. Aplicando a Animação --- */
+  /* E aqui a gente aplica a "receita" da animação no botão. */
+  animation: pulse 2.5s infinite;
+}
+
+/* Ajustando o tamanho do ícone dentro do botão */
+.floating-btn.whatsapp-float i {
+  font-size: 32px; /* Tamanho anterior era ~28px */
+}
+
+/* ======================================================= */
+/* CORREÇÃO DAS IMAGENS DO CARROSSEL DE FEEDBACKS          */
+/* ======================================================= */
+
+/* Primeiro, definimos uma altura fixa para o contêiner do slide.
+   Isso garante que todos os espaços tenham o mesmo tamanho.
+   Ajuste esse valor se achar muito alto ou baixo. */
+.testimonialSwiper .swiper-slide {
+  height: 400px; /* Você pode ajustar este valor para mais ou menos */
+}
+
+/* Agora, a mágica acontece aqui.
+   Selecionamos a imagem DENTRO do slide do carrossel de feedback. */
+.testimonialSwiper .swiper-slide img {
+  width: 100%;      /* Faz a imagem ocupar 100% da largura do slide */
+  height: 100%;     /* Faz a imagem ocupar 100% da altura do slide */
+  object-fit: cover;/* A PROPRIEDADE MÁGICA: Evita a distorção! */
+}
