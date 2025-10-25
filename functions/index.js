@@ -1,70 +1,32 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const mercadopago = require("mercadopago");
-
-// Inicializa o app do Firebase Admin (necessário para mexer com usuários)
-admin.initializeApp();
-
-// Carrega as variáveis de ambiente (sua chave do Mercado Pago)
-require("dotenv").config();
-mercadopago.configure({
-    access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
-});
-
 /**
- * Cloud Function para dar o privilégio de admin a um usuário.
- * Ela recebe um e-mail e adiciona a etiqueta { admin: true } a ele.
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-exports.setAdminRole = functions.https.onCall(async (data, context) => {
-    // Medida de segurança: Futuramente, podemos checar se quem chama já é admin.
-    // if (context.auth.token.admin !== true) {
-    //     return { error: "Apenas administradores podem adicionar outros administradores." };
-    // }
-    
-    try {
-        const user = await admin.auth().getUserByEmail(data.email);
-        await admin.auth().setCustomUserClaims(user.uid, { admin: true });
-        return { message: `Sucesso! O usuário ${data.email} agora é um administrador.` };
-    } catch (error) {
-        console.error(error);
-        return { error: "Ocorreu um erro ao definir o usuário como admin." };
-    }
-});
 
-/**
- * Cloud Function que cria uma preferência de pagamento no Mercado Pago.
- * Ela é chamada pelo nosso site (front-end).
- */
-exports.createPaymentPreference = functions.https.onCall(async (data, context) => {
-    // 'data' contém as informações que nosso site enviou (o item do carrinho)
-    const item = data.item;
+const {setGlobalOptions} = require("firebase-functions");
+const {onRequest} = require("firebase-functions/https");
+const logger = require("firebase-functions/logger");
 
-    // Objeto de preferência que enviaremos ao Mercado Pago
-    const preference = {
-        items: [{
-            title: item.title,
-            unit_price: item.price,
-            quantity: 1,
-        }],
-        // URLs para onde o cliente será redirecionado
-        back_urls: {
-            success: "https://rlima16.github.io/The-Moment-Papelaria-main/carrinho.html?status=success", // URL do seu site ao vivo
-            failure: "https://rlima16.github.io/The-Moment-Papelaria-main/carrinho.html?status=failure",
-            pending: "https://rlima16.github.io/The-Moment-Papelaria-main/carrinho.html?status=pending",
-        },
-        auto_return: "approved", // Retorna automaticamente para o site após pagamento aprovado
-    };
+// For cost control, you can set the maximum number of containers that can be
+// running at the same time. This helps mitigate the impact of unexpected
+// traffic spikes by instead downgrading performance. This limit is a
+// per-function limit. You can override the limit for each function using the
+// `maxInstances` option in the function's options, e.g.
+// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
+// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
+// functions should each use functions.runWith({ maxInstances: 10 }) instead.
+// In the v1 API, each function can only serve one request per container, so
+// this will be the maximum concurrent request count.
+setGlobalOptions({ maxInstances: 10 });
 
-    try {
-        const response = await mercadopago.preferences.create(preference);
-        console.log("Preferência de pagamento criada:", response.body);
+// Create and deploy your first functions
+// https://firebase.google.com/docs/functions/get-started
 
-        // Retorna o link de checkout para o nosso site
-        return {
-            checkoutUrl: response.body.init_point,
-        };
-    } catch (error) {
-        console.error("Erro ao criar preferência de pagamento:", error);
-        throw new functions.https.HttpsError("internal", "Não foi possível criar a preferência de pagamento.");
-    }
-});
+// exports.helloWorld = onRequest((request, response) => {
+//   logger.info("Hello logs!", {structuredData: true});
+//   response.send("Hello from Firebase!");
+// });
