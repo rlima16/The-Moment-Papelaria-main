@@ -3,7 +3,7 @@
 import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js';
 
 // 👇 Endereço do servidor de pagamentos (Cloudflare Worker). Troque depois de publicar o Worker.
-const PAYMENT_API_URL = 'https://COLE-AQUI-O-ENDERECO.workers.dev';
+const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
 
 async function criarPagamento(dados) {
     if (PAYMENT_API_URL.includes('COLE-AQUI')) {

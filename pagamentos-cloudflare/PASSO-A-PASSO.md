@@ -4,6 +4,11 @@ Este Worker substitui o Firebase Functions (que exige o plano Blaze).
 Ele cria o link de pagamento do Mercado Pago e marca o pedido como "Pago" sozinho.
 
 ## 1. Criar o Worker
+> Já feito: o Worker `the-moment-papelaria-main` está ligado ao GitHub. A cada push o Cloudflare publica
+> automaticamente o `worker.js` (configurado no arquivo `wrangler.toml` na raiz do projeto).
+> Endereço: https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev
+
+(Forma manual, caso precise refazer:)
 1. Crie uma conta grátis em https://dash.cloudflare.com/sign-up
 2. Menu **Workers e Pages** > **Criar** > **Criar Worker**
 3. Nome: `pagamentos-themoment` > **Implantar (Deploy)**
@@ -26,7 +31,7 @@ No Worker: **Configurações > Variáveis e segredos > Adicionar** (tipo **Secre
 
 ## 4. Webhook no Mercado Pago
 Mercado Pago Developers > Suas integrações > sua aplicação > **Webhooks** > Configurar notificações
-- URL: `https://pagamentos-themoment.SEUNOME.workers.dev/webhook` (modo de teste e de produção)
+- URL: `https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev/webhook` (modo de teste e de produção)
 - Evento: **Pagamentos** > Salvar
 - Copie a **assinatura secreta** e cadastre como `MP_WEBHOOK_SECRET` (passo 3)
 

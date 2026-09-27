@@ -1,0 +1,10 @@
+# Configuração do Cloudflare Worker (servidor de pagamentos).
+# O site continua publicado pelo GitHub Pages; o Cloudflare publica só o worker abaixo.
+name = "the-moment-papelaria-main"
+main = "pagamentos-cloudflare/worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false
+
+[observability]
+enabled = true
