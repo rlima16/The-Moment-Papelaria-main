@@ -71,3 +71,9 @@ node_modules/
 # Backup local das melhorias
 backup-antes-melhorias/
 backup-antes-novo-visual/
+
+# Servidor de pagamentos: nunca enviar chaves
+.dev.vars
+.wrangler/
+*firebase-adminsdk*.json
+*service-account*.json

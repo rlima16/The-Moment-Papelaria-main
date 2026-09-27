@@ -1,10 +1,24 @@
 // cart-page.js ATUALIZADO NOVAMENTE
 
-import { app, auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js';
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
+import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js';
 
-const functions = getFunctions(app, 'southamerica-east1');
-const criarPagamento = httpsCallable(functions, 'criarPagamento');
+// 👇 Endereço do servidor de pagamentos (Cloudflare Worker). Troque depois de publicar o Worker.
+const PAYMENT_API_URL = 'https://COLE-AQUI-O-ENDERECO.workers.dev';
+
+async function criarPagamento(dados) {
+    if (PAYMENT_API_URL.includes('COLE-AQUI')) {
+        throw new Error('Pagamento com cartão ainda não configurado. Escolha "Pix pela chave".');
+    }
+    const idToken = await auth.currentUser.getIdToken();
+    const resp = await fetch(`${PAYMENT_API_URL}/criar-pagamento`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...dados, idToken })
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok || !data.checkoutUrl) throw new Error(data.error || 'Não foi possível abrir o pagamento. Tente novamente.');
+    return data;
+}
 
 let cart = [];
 let lastOrderData = null; // Esta variável vai guardar os dados do último pedido
@@ -203,7 +217,7 @@ async function sendOrder() {
                 email: document.getElementById('email').value,
                 cpf: document.getElementById('cpf').value
             });
-            window.location.href = result.data.checkoutUrl;
+            window.location.href = result.checkoutUrl;
         } catch (e) {
             console.error('Erro ao iniciar pagamento:', e);
             if (window.showToast) window.showToast(e.message || 'Não foi possível abrir o pagamento. Tente novamente.');
