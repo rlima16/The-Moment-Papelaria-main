@@ -1,2 +1,5 @@
 node_modules/
 *.local
+# Arquivos de credenciais e backups
+.env*
+*.bak-original

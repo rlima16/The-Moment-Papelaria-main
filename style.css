@@ -1000,7 +1000,7 @@ footer li i { width: 18px; color: var(--plum-900); margin-right: 6px; }
 
 /* ---------- Pagamento ---------- */
 .payment-options { display: grid; gap: 10px; }
-.payment-option { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--white); cursor: pointer; transition: border-color .2s, background .2s; font-weight: 400 !important; }
+.form-group .payment-option, .payment-option { display: flex; margin: 0; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--white); cursor: pointer; transition: border-color .2s, background .2s; font-weight: 400 !important; }
 .payment-option:hover { border-color: var(--pink-400); }
 .payment-option input { margin-top: 4px; accent-color: var(--pink-500); width: auto; }
 .payment-option:has(input:checked) { border-color: var(--pink-500); background: var(--blush-100); }
