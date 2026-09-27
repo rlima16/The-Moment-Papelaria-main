@@ -37,7 +37,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         if(authLink) authLink.classList.add('hidden');
         if(userMenuTrigger) userMenuTrigger.classList.remove('hidden');
-        if(userInfo) userInfo.textContent = `Olá, ${user.email.split('@')[0]}`;
+        if(userInfo) userInfo.textContent = user.email.split('@')[0];
     } else {
         if(authLink) authLink.classList.remove('hidden');
         if(userMenuTrigger) userMenuTrigger.classList.add('hidden');
@@ -121,6 +121,9 @@ function traduzErroFirebase(code) {
         case "auth/invalid-email":      return "E-mail inválido.";
         case "auth/user-not-found":     return "Usuário não encontrado.";
         case "auth/wrong-password":     return "Senha incorreta.";
+        case "auth/invalid-credential": return "E-mail ou senha incorretos.";
+        case "auth/weak-password":      return "A senha precisa ter pelo menos 6 caracteres.";
+        case "auth/too-many-requests":  return "Muitas tentativas. Aguarde um pouco e tente de novo.";
         case "auth/email-already-in-use": return "E-mail já cadastrado.";
         default: return "Ocorreu um erro. Tente novamente.";
     }

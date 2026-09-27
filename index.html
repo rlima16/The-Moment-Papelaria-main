@@ -1,187 +1,330 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>The Moment — Papelaria Criativa</title>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#febecf">
+    <title>The Moment — Arquivos de Topo de Bolo para Silhouette (.studio3)</title>
+    <meta name="description" content="Arquivos digitais .studio3 de topos de bolo para cortar na Silhouette: heróis, princesas, anime, Turma da Mônica e muito mais. A partir de R$ 4,00 no Pix.">
+    <link rel="canonical" href="https://themomentoficial.shop/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="The Moment">
+    <meta property="og:title" content="The Moment — Arquivos de Topo de Bolo para Silhouette (.studio3)">
+    <meta property="og:description" content="Arquivos digitais .studio3 de topos de bolo para cortar na Silhouette: heróis, princesas, anime, Turma da Mônica e muito mais. A partir de R$ 4,00 no Pix.">
+    <meta property="og:url" content="https://themomentoficial.shop/">
+    <meta property="og:image" content="https://themomentoficial.shop/web-app-manifest-512x512.png">
+    <meta property="og:locale" content="pt_BR">
     <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="main-header">
-    <div class="header-logo">
-        <a href="index.html">
-            <img src="https://raw.githubusercontent.com/rlima16/The-Moment-Papelaria-main/refs/heads/main/images/logo2.png" alt="Logo The Moment" />
-        </a>
-    </div>
+<div class="announcement-bar">
+    <span><i class="fas fa-scissors"></i>Arquivos .studio3 para Silhouette</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fa-brands fa-pix"></i>Pagamento via Pix</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fab fa-whatsapp"></i>Atendimento pelo WhatsApp</span>
+</div>
 
-    <div class="header-search">
-        <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
-        <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
-    </div>
+<header class="main-header">
+    <div class="header-inner">
+        <div class="header-logo">
+            <a href="index.html" aria-label="The Moment — página inicial">
+                <img src="logo-header.png" alt="The Moment Papelaria Criativa" width="308" height="154">
+            </a>
+        </div>
 
-    <div class="header-user-actions">
-        <div class="action-item" id="user-actions-container">
-            <i class="fa-regular fa-user"></i>
-            <div class="action-text">
-                <a href="#" id="auth-link">Login | Cadastre-se</a>
-                <div id="user-menu-trigger" class="hidden">
-                    <span id="user-info"></span>
+        <div class="header-search" role="search">
+            <input type="search" placeholder="Busque por tema: Sonic, princesa, Mônica..." aria-label="Buscar arquivos">
+            <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
+        </div>
+
+        <div class="header-user-actions">
+            <div class="action-item" id="user-actions-container" role="button" tabindex="0" aria-label="Minha conta">
+                <span class="action-icon"><i class="fa-regular fa-user"></i></span>
+                <div class="action-text">
+                    <small>Olá! Bem-vinda(o)</small>
+                    <a href="#" id="auth-link">Entrar / Cadastrar</a>
+                    <div id="user-menu-trigger" class="hidden"><span id="user-info"></span></div>
+                </div>
+            </div>
+            <div id="user-dropdown" class="dropdown-content hidden">
+                <a href="minha-conta.html"><i class="fa-solid fa-receipt"></i> Meus pedidos</a>
+                <a href="#" id="logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
+            </div>
+            <a class="action-item" href="carrinho.html" id="cart-link-header" aria-label="Carrinho">
+                <span class="action-icon"><i class="fa-solid fa-bag-shopping"></i><span class="cart-badge" id="cart-count">0</span></span>
+                <div class="action-text">
+                    <small>Meu carrinho</small>
+                    <span id="cart-total-value">R$ 0,00</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    <nav class="secondary-nav" aria-label="Menu principal">
+        <a href="index.html" class="active">Início</a>
+        <a href="produtos.html">Arquivos</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="ajuda.html">Dúvidas</a>
+        <a href="#contato">Contato</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-text">
+                <span class="hero-kicker"><i class="fas fa-heart"></i> Papelaria criativa há 7 anos</span>
+                <h1>Topos de bolo <span class="script">encantadores</span>, prontos para cortar na sua Silhouette</h1>
+                <p class="hero-sub">Arquivos digitais <strong>.studio3</strong> com mais de 120 temas. Compre, receba o arquivo e crie festas inesquecíveis a partir de <strong>R$ 4,00</strong>.</p>
+                <div class="hero-ctas">
+                    <a href="produtos.html" class="btn btn-lg">Ver todos os arquivos <i class="fas fa-arrow-right"></i></a>
+                    <a href="#como-funciona" class="btn btn-lg btn-outline">Como funciona</a>
+                </div>
+                <div class="hero-proof">
+                    <div><i class="fas fa-check-circle"></i> +120 temas</div>
+                    <div><i class="fa-brands fa-pix"></i> Pagamento via Pix</div>
+                    <div><i class="fab fa-whatsapp"></i> Suporte humanizado</div>
+                </div>
+            </div>
+            <div class="hero-visual" aria-hidden="true">
+                <div class="hero-blob"></div>
+                <div class="hero-card"><img src="images%20insta/Sonic.png" alt="" width="400" height="400"></div>
+                <div class="hero-card"><img src="images%20insta/MagaliFrutas.png" alt="" width="400" height="400"></div>
+                <div class="hero-card"><img src="images%20insta/HarryPotter.png" alt="" width="400" height="400"></div>
+                <div class="hero-sticker"><i class="fas fa-scissors"></i><div><b>Pronto para cortar</b>Formato .studio3</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trust-strip">
+        <div class="container">
+            <div class="trust-grid">
+                <div class="trust-item"><i class="fas fa-file-arrow-down"></i><div><strong>Arquivo digital</strong><span>Formato .studio3 para Silhouette Studio</span></div></div>
+                <div class="trust-item"><i class="fa-brands fa-pix"></i><div><strong>Pagamento via Pix</strong><span>Rápido, simples e seguro</span></div></div>
+                <div class="trust-item"><i class="fas fa-wand-magic-sparkles"></i><div><strong>+120 temas</strong><span>Heróis, princesas, anime e mais</span></div></div>
+                <div class="trust-item"><i class="fab fa-whatsapp"></i><div><strong>Atendimento de verdade</strong><span>Tire dúvidas pelo WhatsApp</span></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Encontre pelo tema</span>
+                <h2>Qual é a festa da vez?</h2>
+                <p>Escolha uma categoria e encontre o topo perfeito em segundos.</p>
+            </div>
+            <div class="category-tiles reveal">
+            <a class="category-tile" href="produtos.html?categoria=Herois"><i class="fas fa-mask"></i>Heróis</a>
+            <a class="category-tile" href="produtos.html?categoria=Princesas"><i class="fas fa-crown"></i>Princesas</a>
+            <a class="category-tile" href="produtos.html?categoria=Anime"><i class="fas fa-dragon"></i>Anime</a>
+            <a class="category-tile" href="produtos.html?categoria=Disney"><i class="fas fa-wand-magic-sparkles"></i>Disney</a>
+            <a class="category-tile" href="produtos.html?categoria=Turma%20da%20Monica"><i class="fas fa-children"></i>Turma da Mônica</a>
+            <a class="category-tile" href="produtos.html?categoria=Desenhos"><i class="fas fa-palette"></i>Desenhos</a>
+            <a class="category-tile" href="produtos.html?categoria=Jogos"><i class="fas fa-gamepad"></i>Jogos</a>
+            <a class="category-tile" href="produtos.html?categoria=Carros"><i class="fas fa-car-side"></i>Carros</a>
+            <a class="category-tile" href="produtos.html?categoria=Cha%20de%20Bebe"><i class="fas fa-baby"></i>Chá de Bebê</a>
+            <a class="category-tile" href="produtos.html?categoria=Diversos"><i class="fas fa-cake-candles"></i>Diversos</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-tint">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Os queridinhos</span>
+                <h2>Mais amados pelas clientes</h2>
+                <p>Os arquivos que mais fazem sucesso nas festas.</p>
+            </div>
+            <div id="featured-grid" class="product-grid">
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            </div>
+            <div class="section-cta"><a href="produtos.html" class="btn btn-lg">Ver todos os arquivos <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+    </section>
+
+    <section class="section" id="como-funciona">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Simples assim</span>
+                <h2>Como funciona</h2>
+                <p>Do carrinho até o corte na sua máquina em 3 passos.</p>
+            </div>
+            <div class="steps reveal">
+                <div class="step"><i class="fas fa-bag-shopping"></i><h3>Escolha seus temas</h3><p>Adicione ao carrinho os arquivos que você quer e finalize o pedido.</p></div>
+                <div class="step"><i class="fa-brands fa-pix"></i><h3>Pague com Pix</h3><p>Use o QR Code ou a chave Pix e envie o comprovante pelo WhatsApp.</p></div>
+                <div class="step"><i class="fas fa-scissors"></i><h3>Receba e crie</h3><p>Enviamos seu arquivo .studio3. É só abrir no Silhouette Studio, imprimir e cortar!</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-tint">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Depoimentos</span>
+                <h2>Quem compra, se apaixona</h2>
+                <p>Mensagens reais de clientes que já criaram com a The Moment.</p>
+            </div>
+            <div class="swiper testimonialSwiper reveal">
+                <div class="swiper-wrapper" id="testimonial-wrapper"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="promo-banner reveal">
+                <div>
+                    <span class="eyebrow">Também temos produtos físicos</span>
+                    <h2>Prefere o topo de bolo prontinho?</h2>
+                    <p>Nossa loja oficial na Shopee tem topos já impressos e montados, enviados para todo o Brasil.</p>
+                    <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" class="btn btn-lg">Visitar loja na Shopee <i class="fas fa-arrow-up-right-from-square"></i></a>
+                </div>
+                <div class="promo-thumbs">
+                <a href="https://shopee.com.br/product/307816726/22497648197/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lxtuoetly7w6c7.webp" alt="Topo de bolo pronto na Shopee 1" loading="lazy"></a>
+                <a href="https://shopee.com.br/product/307816726/22698682627/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mcxx7mixlx6a5d.webp" alt="Topo de bolo pronto na Shopee 2" loading="lazy"></a>
+                <a href="https://shopee.com.br/product/307816726/23797643530/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lxu0w6xx129r7e.webp" alt="Topo de bolo pronto na Shopee 3" loading="lazy"></a>
+                <a href="https://shopee.com.br/product/307816726/22494385960/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-81z1k-meacsisnzsw175.webp" alt="Topo de bolo pronto na Shopee 4" loading="lazy"></a>
+                <a href="https://shopee.com.br/product/307816726/23694233077/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca14aq4pm2385.webp" alt="Topo de bolo pronto na Shopee 5" loading="lazy"></a>
+                <a href="https://shopee.com.br/product/307816726/22394233278/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca2kucsjgtne2@resize_w450_nl.webp" alt="Topo de bolo pronto na Shopee 6" loading="lazy"></a>
+                <a href="https://shopee.com.br/product/307816726/22294242899/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca26pb38h632e.webp" alt="Topo de bolo pronto na Shopee 7" loading="lazy"></a>
+                <a href="https://shopee.com.br/product/307816726/22098744516/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca1nd4k4oa3dd.webp" alt="Topo de bolo pronto na Shopee 8" loading="lazy"></a>
                 </div>
             </div>
         </div>
-        <div id="user-dropdown" class="dropdown-content hidden">
-            <a href="minha-conta.html">Minha Conta</a>
-            <a href="#" id="logout-link">Sair</a>
-        </div>
-        <div class="action-item">
-            <i class="fa-solid fa-bag-shopping"></i>
-            <div class="action-text">
-                <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
-                <span id="cart-total-value">R$ 0,00</span>
+    </section>
+
+    <section class="section-sm">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">@t_h_e_m_o_m_e_n_t</span>
+                <h2>Siga no Instagram</h2>
+                <p>Novidades, bastidores e inspirações para a sua próxima festa.</p>
+            </div>
+            <div class="image-grid reveal">
+            <a href="https://www.instagram.com/p/DPCOm4cjhgY/" target="_blank" rel="noopener noreferrer" aria-label="Ver no Instagram: Topo de bolo Harry Potter"><img src="images%20insta/HarryPotter.png" alt="Topo de bolo Harry Potter" loading="lazy"></a>
+            <a href="https://www.instagram.com/p/C6HLFnuxjke/?img_index=1" target="_blank" rel="noopener noreferrer" aria-label="Ver no Instagram: Topo de bolo Flork"><img src="images%20insta/FlorkRepbardei.png" alt="Topo de bolo Flork" loading="lazy"></a>
+            <a href="https://www.instagram.com/p/DOC30F5jdHi/" target="_blank" rel="noopener noreferrer" aria-label="Ver no Instagram: Topo de bolo Magali Frutas"><img src="images%20insta/MagaliFrutas.png" alt="Topo de bolo Magali Frutas" loading="lazy"></a>
+            <a href="https://www.instagram.com/p/DOD4GX9jgGb/?img_index=2" target="_blank" rel="noopener noreferrer" aria-label="Ver no Instagram: Topo de bolo Sonic"><img src="images%20insta/Sonic.png" alt="Topo de bolo Sonic" loading="lazy"></a>
             </div>
         </div>
-    </div>
-</header>
-
-<nav class="secondary-nav">
-    <a href="index.html">Página Inicial</a>
-    <a href="produtos.html">Produtos</a>
-    <a href="#contato">Contato</a>
-</nav>
-
-    <section class="hero">
-        <div class="welcome-text">
-            <h1>✨ Bem-vindos à The Moment! ✨</h1>
-            <p>Há 7 anos, transformamos sonhos em detalhes únicos para deixar suas festas ainda mais especiais.</p>
-            <p>Aqui você irá encontrar diversos Arquivos Digitais no Formato .studio3 para o Silhouette Studio.</p>
-        </div>
-        <a href="produtos.html" class="btn">Ver todos os produtos</a>
     </section>
 
-    <section class="produtos">
-        <h2>Conheça Nossos Arquivos Digitais</h2>
-        <div class="swiper">
-            <div class="swiper-wrapper" id="carousel-wrapper"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-pagination"></div>
-        </div>
-    </section>
-
-    <section class="centered-section">
-        <h2>Também temos Produtos Físicos! 🍰</h2>
-        <p>Visite nossa loja oficial na Shopee para ver nossa coleção completa.</p>
-        <div class="image-grid">
-            <a href="https://shopee.com.br/product/307816726/22497648197/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lxtuoetly7w6c7.webp" alt="Produto Físico 1"></a>
-            <a href="https://shopee.com.br/product/307816726/22698682627/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mcxx7mixlx6a5d.webp" alt="Produto Físico 2"></a>
-            <a href="https://shopee.com.br/product/307816726/23797643530/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-lxu0w6xx129r7e.webp" alt="Produto Físico 3"></a>
-            <a href="https://shopee.com.br/product/307816726/22494385960/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-81z1k-meacsisnzsw175.webp" alt="Produto Físico 4"></a>
-            <a href="https://shopee.com.br/product/307816726/23694233077/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca14aq4pm2385.webp" alt="Produto Físico 5"></a>
-            <a href="https://shopee.com.br/product/307816726/22394233278/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca2kucsjgtne2@resize_w450_nl.webp" alt="Produto Físico 6"></a>
-            <a href="https://shopee.com.br/product/307816726/22294242899/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca26pb38h632e.webp" alt="Produto Físico 6"></a>
-            <a href="https://shopee.com.br/product/307816726/22098744516/" target="_blank" rel="noopener noreferrer"><img src="https://down-br.img.susercontent.com/file/br-11134207-7r98o-mca1nd4k4oa3dd.webp" alt="Produto Físico 6"></a>
-        </div>
-    </section>
-
-    <section class="testimonial-section">
-        <h2>O que nossos clientes dizem ✨</h2>
-        <div class="swiper testimonialSwiper">
-            <div class="swiper-wrapper" id="testimonial-wrapper"></div>
-            <div class="swiper-pagination"></div>
-        </div>
-    </section>
-
-    <section class="instagram-section">
-        <h2>Siga-nos no Instagram</h2>
-        <p>Fique por dentro das novidades e dos nossos últimos trabalhos!</p>
-        <div class="image-grid">
-            <a href="https://www.instagram.com/p/DPCOm4cjhgY/" target="_blank" rel="noopener noreferrer"><img src="https://raw.githubusercontent.com/rlima16/The-Moment-Papelaria-main/refs/heads/main/images%20insta/HarryPotter.png" alt="Post Instagram 1"></a>
-            <a href="https://www.instagram.com/p/C6HLFnuxjke/?img_index=1" target="_blank" rel="noopener noreferrer"><img src="https://raw.githubusercontent.com/rlima16/The-Moment-Papelaria-main/refs/heads/main/images%20insta/FlorkRepbardei.png" alt="Post Instagram 2"></a>
-            <a href="https://www.instagram.com/p/DOC30F5jdHi/" target="_blank" rel="noopener noreferrer"><img src="https://raw.githubusercontent.com/rlima16/The-Moment-Papelaria-main/refs/heads/main/images%20insta/MagaliFrutas.png" alt="Post Instagram 3"></a>
-            <a href="https://www.instagram.com/p/DOD4GX9jgGb/?img_index=2" target="_blank" rel="noopener noreferrer"><img src="https://raw.githubusercontent.com/rlima16/The-Moment-Papelaria-main/refs/heads/main/images%20insta/Sonic.png" alt="Post Instagram 4"></a>
-        </div>
-    </section>
-
-    <footer id="contato">
-        <p>The Moment</p>
-        <p>Email: adm@themomentoficial.shop</p>
-        <p>Telefone: (11) 2050-4970</p>
-        <p>Atendimento: De Seg a Sex das 09h às 18h</p>
-        <div class="social-icons">
-            <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-                <i class="fab fa-whatsapp"></i>
-            </a>
-            <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" aria-label="Shopee">
-                <i class="fas fa-store"></i>
-            </a>
-        </div>
-        <div class="copyright-footer">
-            <p>Copyright The Moment - 2025. Todos os direitos reservados.</p>
-            <p>Desenvolvido por: Rodrigo Lima</p>
-        </div>
-    </footer>
-
-    <div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
-        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-        <img class="lightbox-content" id="lightbox-img" alt="preview" onclick="event.stopPropagation()" />
-    </div>
-
-    <div id="auth-modal" class="auth-modal hidden" role="dialog" aria-modal="true">
-        <div class="auth-box">
-            <span class="auth-close" onclick="closeAuthModal()" aria-label="Fechar">&times;</span>
-            <div id="login-view">
-                <h2>Login</h2>
-                <form id="login-form" autocomplete="on">
-                    <input type="email" id="login-email" placeholder="E-mail" required>
-                    <input type="password" id="login-password" placeholder="Senha" required minlength="6">
-                    <button type="submit" class="btn">Entrar</button>
-                    <p id="login-error" class="error-message hidden" role="alert"></p>
-                </form>
-                <p class="auth-switch" style="text-align: right; margin-top: -5px; font-size: 13px;">
-                    <a href="#" id="forgot-password-link">Esqueci a senha</a>
-                </p>
-                <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
-            </div>
-            <div id="register-view" class="hidden">
-                <h2>Cadastre-se</h2>
-                <form id="signup-form" autocomplete="on">
-                    <input type="email" id="signup-email" placeholder="E-mail" required />
-                    <input type="password" id="signup-password" placeholder="Senha (mínimo 6 caracteres)" required minlength="6" />
-                    <button type="submit" class="btn">Criar Conta</button>
-                    <p id="signup-error" class="error-message hidden" role="alert"></p>
-                </form>
-                <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginView(); return false;">Faça Login</a></p>
+    <section class="section">
+        <div class="container">
+            <div class="cta-card reveal">
+                <span class="eyebrow">Não achou o tema?</span>
+                <h2>A gente te ajuda a encontrar</h2>
+                <p>Temos muitos arquivos que ainda não estão no site. Mande uma mensagem e conte qual é a festa!</p>
+                <a href="https://wa.me/551120504970?text=Olá!%20Estou%20procurando%20um%20arquivo%20de%20topo%20de%20bolo%20com%20o%20tema:%20" target="_blank" rel="noopener noreferrer" class="btn btn-lg btn-whatsapp"><i class="fab fa-whatsapp"></i> Falar no WhatsApp</a>
+                <a href="ajuda.html" class="btn btn-lg btn-outline">Dúvidas frequentes</a>
             </div>
         </div>
-    </div>
+    </section>
+</main>
 
-    <div class="floating-buttons-container">
-        <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" class="floating-btn instagram-float" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-            <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://wa.me/551120504970" class="floating-btn whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-        </a>
+<footer id="contato">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <img src="logo-header.png" alt="The Moment Papelaria Criativa" loading="lazy" width="308" height="154">
+            <p>Há 7 anos transformando sonhos em detalhes únicos. Arquivos de topo de bolo prontos para cortar na sua Silhouette.</p>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" aria-label="Loja na Shopee"><i class="fas fa-store"></i></a>
+            </div>
+        </div>
+        <div>
+            <h4>Loja</h4>
+            <ul>
+                <li><a href="produtos.html">Todos os arquivos</a></li>
+                <li><a href="produtos.html?categoria=Herois">Heróis</a></li>
+                <li><a href="produtos.html?categoria=Princesas">Princesas</a></li>
+                <li><a href="produtos.html?categoria=Anime">Anime</a></li>
+                <li><a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer">Produtos físicos (Shopee)</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Ajuda</h4>
+            <ul>
+                <li><a href="index.html#como-funciona">Como funciona</a></li>
+                <li><a href="ajuda.html">Dúvidas frequentes</a></li>
+                <li><a href="ajuda.html#trocas">Trocas e reembolso</a></li>
+                <li><a href="ajuda.html#privacidade">Privacidade</a></li>
+                <li><a href="minha-conta.html">Meus pedidos</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Atendimento</h4>
+            <ul>
+                <li><i class="fab fa-whatsapp"></i><a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer">(11) 2050-4970</a></li>
+                <li><i class="fa-regular fa-envelope"></i><a href="mailto:adm@themomentoficial.shop">adm@themomentoficial.shop</a></li>
+                <li><i class="fa-regular fa-clock"></i>Seg a Sex, das 9h às 18h</li>
+            </ul>
+        </div>
     </div>
+    <div class="footer-bottom">
+        <p>© 2026 The Moment · Todos os direitos reservados · Desenvolvido por Rodrigo Lima</p>
+        <span class="pay-chip"><i class="fa-brands fa-pix"></i> Pagamento via Pix</span>
+    </div>
+</footer>
 
-    <script type="module" src="firebase-auth.js"></script>
-    <script type="module" src="shared-functions.js"></script>
-    <script type="module" src="script.js"></script> 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<div class="floating-buttons-container">
+    <a href="https://wa.me/551120504970" class="floating-btn whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco pelo WhatsApp"><i class="fab fa-whatsapp"></i></a>
+</div>
+
+<div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="event.stopPropagation(); closeLightbox();" aria-label="Fechar">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" alt="Imagem ampliada" onclick="event.stopPropagation()">
+</div>
+
+<div id="auth-modal" class="auth-modal hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="auth-box">
+        <span class="auth-close" onclick="closeAuthModal()" aria-label="Fechar">&times;</span>
+        <div id="login-view">
+            <h2 id="auth-title">Que bom te ver!</h2>
+            <p class="auth-lead">Entre para finalizar sua compra e acompanhar seus pedidos.</p>
+            <form id="login-form" autocomplete="on">
+                <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                <input type="password" id="login-password" placeholder="Senha" required minlength="6">
+                <button type="submit" class="btn">Entrar</button>
+                <p id="login-error" class="error-message hidden" role="alert"></p>
+            </form>
+            <p class="auth-switch"><a href="#" id="forgot-password-link">Esqueci minha senha</a></p>
+            <p class="auth-switch">Ainda não tem conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se grátis</a></p>
+        </div>
+        <div id="register-view" class="hidden">
+            <h2>Criar conta</h2>
+            <p class="auth-lead">Leva menos de um minuto ✨</p>
+            <form id="signup-form" autocomplete="on">
+                <input type="email" id="signup-email" placeholder="Seu e-mail" required>
+                <input type="password" id="signup-password" placeholder="Crie uma senha (mínimo 6 caracteres)" required minlength="6">
+                <button type="submit" class="btn">Criar minha conta</button>
+                <p id="signup-error" class="error-message hidden" role="alert"></p>
+            </form>
+            <p class="auth-switch">Já tem conta? <a href="#" onclick="showLoginView(); return false;">Entrar</a></p>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="firebase-auth.js"></script>
+<script type="module" src="shared-functions.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script type="module" src="script.js"></script>
 </body>
 </html>

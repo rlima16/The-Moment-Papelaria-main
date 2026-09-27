@@ -1,55 +1,40 @@
-// script.js ATUALIZADO com carrossel de feedbacks
+// script.js — página inicial
 
 import { db } from './firebase-auth.js';
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { createProductCard } from './shared-functions.js';
 
-// --- INICIALIZAÇÃO QUANDO A PÁGINA CARREGA ---
-document.addEventListener('DOMContentLoaded', function () {
-    displayProductCarousel(); // Inicia o carrossel de produtos
-    displayTestimonialCarousel(); // Inicia o carrossel de feedbacks
+document.addEventListener('DOMContentLoaded', () => {
+    displayFeaturedProducts();
+    displayTestimonialCarousel();
 });
 
-
-// --- FUNÇÃO DO CARROSSEL DE PRODUTOS ---
-async function displayProductCarousel() {
-    const carouselWrapper = document.getElementById('carousel-wrapper');
-    if (!carouselWrapper) return;
+// --- OS QUERIDINHOS (produtos marcados como destaque no painel admin) ---
+async function displayFeaturedProducts() {
+    const grid = document.getElementById('featured-grid');
+    if (!grid) return;
 
     try {
-        const q = query(collection(db, "products"), where("featured", "==", true));
-        const querySnapshot = await getDocs(q);
-        const featuredProducts = [];
-        querySnapshot.forEach((doc) => {
-            featuredProducts.push({ id: doc.id, ...doc.data() });
-        });
+        const snapshot = await getDocs(query(collection(db, "products"), where("featured", "==", true)));
+        const featured = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort(() => 0.5 - Math.random())   // muda a ordem a cada visita
+            .slice(0, 8);
 
-        carouselWrapper.innerHTML = '';
-        featuredProducts.forEach(product => {
-            const slide = document.createElement('div');
-            slide.className = 'swiper-slide';
-            slide.innerHTML = `<img src="${product.image}" alt="${product.title}" onclick="window.openLightbox('${product.image}')">`;
-            carouselWrapper.appendChild(slide);
-        });
-        
-        // Inicializa o Swiper dos produtos
-        new Swiper(".swiper:not(.testimonialSwiper)", { // Seletor para não conflitar
-            slidesPerView: 2,
-            spaceBetween: 20,
-            autoplay: { delay: 3500, disableOnInteraction: false },
-            loop: true,
-            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-            pagination: { el: '.swiper-pagination', clickable: true },
-        });
-
+        grid.innerHTML = '';
+        if (featured.length === 0) {
+            grid.closest('section')?.classList.add('hidden');
+            return;
+        }
+        featured.forEach(product => grid.appendChild(createProductCard(product)));
     } catch (error) {
-        console.error("Erro ao buscar produtos para o carrossel:", error);
+        console.error("Erro ao buscar produtos em destaque:", error);
+        grid.closest('section')?.classList.add('hidden');
     }
 }
 
-
-// --- NOVA FUNÇÃO DO CARROSSEL DE FEEDBACKS ---
+// --- DEPOIMENTOS (prints de clientes) ---
 function displayTestimonialCarousel() {
-    // 👇 COLOQUE AQUI OS NOMES DOS SEUS ARQUIVOS DE IMAGEM 👇
+    // 👇 Para adicionar depoimentos, coloque a imagem na pasta "images" e o nome aqui 👇
     const testimonialImages = [
         'images/feedback1.jpg',
         'images/feedback2.jpg',
@@ -59,48 +44,36 @@ function displayTestimonialCarousel() {
         'images/feedback6.jpg',
         'images/feedback7.jpg',
         'images/feedback8.jpg',
-        'images/feedback9.jpg' 
-        // Adicione mais imagens aqui, se tiver
+        'images/feedback9.jpg'
     ];
 
-    const testimonialWrapper = document.getElementById('testimonial-wrapper');
-    if (!testimonialWrapper) return;
+    const wrapper = document.getElementById('testimonial-wrapper');
+    if (!wrapper) return;
 
-    testimonialWrapper.innerHTML = '';
-
+    wrapper.innerHTML = '';
     testimonialImages.forEach(imageUrl => {
         const slide = document.createElement('div');
         slide.className = 'swiper-slide';
-        // ADICIONAMOS O onclick AQUI PARA ABRIR O LIGHTBOX
-        slide.innerHTML = `<img src="${imageUrl}" alt="Feedback de cliente" onclick="window.openLightbox('${imageUrl}')">`;
-        testimonialWrapper.appendChild(slide);
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Depoimento de cliente da The Moment';
+        img.loading = 'lazy';
+        img.addEventListener('click', () => window.openLightbox(imageUrl));
+        slide.appendChild(img);
+        wrapper.appendChild(slide);
     });
 
-    // Inicializa o Swiper dos feedbacks
+    if (typeof Swiper === 'undefined') return;
     new Swiper(".testimonialSwiper", {
-        slidesPerView: 1, // Mostra 1 por vez no celular
-        spaceBetween: 30,
+        slidesPerView: 1.15,
+        spaceBetween: 16,
         loop: true,
-        autoplay: {
-            delay: 4000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-        },
-        // Mostra mais de 1 em telas maiores
+        grabCursor: true,
+        autoplay: { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true },
+        pagination: { el: ".testimonialSwiper .swiper-pagination", clickable: true },
         breakpoints: {
-            // Quando a tela for 768px ou maior
-            768: {
-                slidesPerView: 2,
-                spaceBetween: 40,
-            },
-            // Quando a tela for 1024px ou maior
-            1024: {
-                slidesPerView: 3,
-                spaceBetween: 50,
-            },
+            600:  { slidesPerView: 2.2, spaceBetween: 20 },
+            1024: { slidesPerView: 3, spaceBetween: 28 },
         },
     });
 }

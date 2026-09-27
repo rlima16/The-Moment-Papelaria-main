@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - The Moment</title>
+    <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+    <link rel="manifest" href="site.webmanifest">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="admin-panel">
         <nav class="admin-nav">
             <div class="admin-nav-header">
-                <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
+                <img src="transparent-Photoroom.png" alt="Logo The Moment" />
                 <h3>Painel Admin</h3>
             </div>
             <ul>
@@ -39,6 +41,10 @@
                     <div class="form-group">
                         <label for="product-image-url">URL da Imagem</label>
                         <input type="text" id="product-image-url" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">Descrição do produto (opcional)</label>
+                        <textarea id="product-description" rows="4" placeholder="Ex.: Arquivo com 6 peças: nome, idade, personagem e 3 nuvens. Tamanho sugerido: 20 cm de largura."></textarea>
                     </div>
                     <div class="form-group">
                         <label for="product-category">Categoria</label>

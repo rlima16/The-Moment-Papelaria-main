@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCartFromSession();
 });
 
+// Quando o cliente faz login/logout, atualiza o aviso do carrinho
+auth.onAuthStateChanged(() => {
+    if (!lastOrderData) renderCartView();
+});
+
 function loadCartFromSession() {
     const cartData = sessionStorage.getItem('shoppingCart');
     if (cartData) {
@@ -17,73 +22,124 @@ function loadCartFromSession() {
     renderCartView();
 }
 
-// TELA 1: MOSTRA O CARRINHO E O FORMULÁRIO (sem alterações)
+const fmt = (v) => `R$ ${Number(v || 0).toFixed(2).replace('.', ',')}`;
+const escapeHtml = (t) => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// TELA 1: CARRINHO + DADOS DO CLIENTE
 function renderCartView() {
     const container = document.querySelector('.cart-page-container');
     if (!container) return;
 
     if (cart.length === 0) {
         container.innerHTML = `
-            <h1>Resumo do seu Pedido</h1>
-            <p>Seu carrinho está vazio.</p>
-            <a href="produtos.html" class="btn" style="width: auto; margin: 20px auto; display: block;">Ver produtos</a>`;
-    } else {
-        const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-        let itemsHtml = '';
-        cart.forEach((item, index) => {
-            itemsHtml += `<tr><td>${item.title}</td><td>R$ ${Number(item.price).toFixed(2).replace('.', ',')}</td><td><button class="remove-btn-page" onclick="removeFromCart(${index})">Remover</button></td></tr>`;
-        });
-        container.innerHTML = `
-            <h1>Resumo do seu Pedido</h1>
-            <a href="produtos.html" class="link-continuar-comprando">‹ Continuar Comprando</a>
-            <table id="cart-page-summary">
-                <tr><th>Produto</th><th>Preço</th><th>Ação</th></tr>
-                ${itemsHtml}
-                <tr class="total-row"><td colspan="2"><b>Total</b></td><td><b>R$ ${total.toFixed(2).replace('.', ',')}</b></td></tr>
-            </table>
-            <div id="checkout-container">
-                <h2 style="text-align: center;">Preencha seus Dados para Continuar</h2>
-                <form id="customer-form">
-                    <div class="form-group"><label for="nome">Nome Completo</label><input type="text" id="nome" name="nome" required></div>
-                    <div class="form-group"><label for="email">E-mail para Contato</label><input type="email" id="email" name="email" required></div>
-                    <div class="form-group"><label for="cpf">CPF</label><input type="text" id="cpf" name="cpf" required></div>
-                </form>
-                <button type="button" id="confirm-order-btn" class="btn">Confirmar Compra e Pagar</button>
+            <div class="panel empty-cart">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <h2>Seu carrinho está vazinho</h2>
+                <p>Que tal escolher o tema da próxima festa?</p>
+                <a href="produtos.html" class="btn btn-lg">Ver arquivos <i class="fas fa-arrow-right"></i></a>
             </div>`;
-        document.getElementById('confirm-order-btn').addEventListener('click', sendOrder);
+        updateCartHeaderInfo();
+        return;
     }
+
+    const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+    const itemsHtml = cart.map((item, index) => `
+        <div class="cart-item">
+            ${item.image ? `<img src="${escapeHtml(item.image)}" alt="">` : '<div class="ph"><i class="fas fa-image"></i></div>'}
+            <div>
+                <h3>${escapeHtml(item.title)}</h3>
+                <div class="meta"><i class="fas fa-file-arrow-down"></i> Arquivo digital .studio3</div>
+                <button class="remove-btn-page" onclick="removeFromCart(${index})"><i class="fa-regular fa-trash-can"></i> Remover</button>
+            </div>
+            <div class="price">${fmt(item.price)}</div>
+        </div>`).join('');
+
+    const loggedIn = !!auth.currentUser;
+    container.innerHTML = `
+        <div class="cart-layout">
+            <div class="panel">
+                <h2>Seus arquivos (${cart.length})</h2>
+                ${itemsHtml}
+                <a href="produtos.html" class="link-continuar-comprando"><i class="fas fa-arrow-left"></i> Continuar comprando</a>
+            </div>
+
+            <div class="panel" id="checkout-container">
+                <h2>Finalizar pedido</h2>
+                <div class="summary-row"><span>Subtotal</span><span>${fmt(total)}</span></div>
+                <div class="summary-row"><span>Entrega</span><span>Digital · grátis</span></div>
+                <div class="summary-row total"><span>Total</span><span>${fmt(total)}</span></div>
+
+                <div class="digital-info-banner" style="margin:18px 0">
+                    <i class="fas fa-circle-info"></i>
+                    <p>Você está comprando <strong>arquivos digitais (.studio3)</strong>. Nenhum item físico será enviado.</p>
+                </div>
+
+                ${loggedIn ? '' : `
+                <div class="login-required-notice">
+                    <p><strong>Entre na sua conta para finalizar.</strong> Assim você acompanha seus pedidos em "Minha conta".</p>
+                    <button type="button" class="btn" onclick="window.openAuthModal && window.openAuthModal()">Entrar ou criar conta</button>
+                </div>`}
+
+                <form id="customer-form">
+                    <div class="form-group"><label for="nome">Nome completo</label><input type="text" id="nome" name="nome" autocomplete="name" required></div>
+                    <div class="form-group"><label for="email">E-mail para contato</label><input type="email" id="email" name="email" autocomplete="email" value="${escapeHtml(auth.currentUser?.email || '')}" required></div>
+                    <div class="form-group"><label for="cpf">CPF</label><input type="text" id="cpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required></div>
+                    <p class="form-privacy-note">Seus dados são usados apenas para identificar o pedido. Veja nossa <a href="ajuda.html#privacidade">política de privacidade</a>.</p>
+                </form>
+                <button type="button" id="confirm-order-btn" class="btn btn-lg"><i class="fa-brands fa-pix"></i> Confirmar e pagar com Pix</button>
+                <p class="secure-note"><i class="fas fa-lock"></i> Seus dados ficam protegidos</p>
+            </div>
+        </div>`;
+
+    const cpf = document.getElementById('cpf');
+    cpf.addEventListener('input', () => {
+        const d = cpf.value.replace(/\D/g, '').slice(0, 11);
+        cpf.value = d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    });
+    document.getElementById('confirm-order-btn').addEventListener('click', sendOrder);
     updateCartHeaderInfo();
 }
 
-// TELA 2: MOSTRA AS INFORMAÇÕES DO PIX (COM O NOVO BOTÃO)
+// TELA 2: PAGAMENTO PIX
 function renderPixPaymentView() {
     const container = document.querySelector('.cart-page-container');
     if (!container || !lastOrderData) return;
 
+    const hero = document.querySelector('.page-hero');
+    if (hero) hero.classList.add('hidden');
+
     container.innerHTML = `
-        <div class="pix-payment-view">
-            <h1>Ótimo! Pedido Registrado.</h1>
-            <p>Para finalizar, realize o pagamento via PIX para o pedido <strong>${lastOrderData.orderId}</strong></p>
-            
-            <img src="https://raw.githubusercontent.com/rlima16/The-Moment-Papelaria/refs/heads/main/pix.png" alt="QR Code PIX" style="max-width: 250px; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            
-            <p style="font-size: 1.1em; margin-top: 15px;"><strong>Valor: R$ ${Number(lastOrderData.total).toFixed(2).replace('.', ',')}</strong></p>
-            
+        <div class="panel pix-payment-view">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <h1>Pedido registrado!</h1>
+            <p>Pedido <strong>${escapeHtml(lastOrderData.orderId)}</strong>. Agora é só pagar via Pix:</p>
+            <div class="pix-amount">${fmt(lastOrderData.total)}</div>
+
+            <img src="pix.png" alt="QR Code Pix">
+
             <div class="pix-key-container">
-                <p><strong>Chave PIX (E-mail):</strong></p>
+                <p style="margin:0"><strong>Ou use a chave Pix (e-mail):</strong></p>
                 <div class="input-group">
                     <input type="text" id="pix-key-display" value="adm@themomentoficial.shop" readonly>
-                    <button class="btn-copy" onclick="copyPixKey()">Copiar Chave</button>
+                    <button class="btn-copy" onclick="copyPixKey()"><i class="fa-regular fa-copy"></i> Copiar</button>
                 </div>
             </div>
-            
-            <button type="button" class="btn btn-whatsapp" onclick="sendOrderToWhatsapp()" style="margin-top: 20px; background-color: #25D366;">
-                <i class="fab fa-whatsapp"></i> Solicitar meu Pedido via Whatsapp
-            </button>
-            
-            <a href="index.html" class="btn btn-secondary" style="margin-top: 15px; display: inline-block; width: auto;">Voltar à Página Inicial</a>
+
+            <div class="next-steps">
+                <h2>Como receber seu arquivo</h2>
+                <ol>
+                    <li>Pague o valor acima via Pix (QR Code ou chave).</li>
+                    <li>Clique no botão abaixo e envie o <strong>comprovante</strong> pelo WhatsApp.</li>
+                    <li>Assim que confirmarmos o pagamento, enviamos seu arquivo. Atendimento de segunda a sexta, das 9h às 18h.</li>
+                </ol>
+                <p>Acompanhe o status em <a href="minha-conta.html">Minha conta</a>.</p>
+            </div>
+
+            <button type="button" class="btn btn-lg btn-whatsapp" onclick="sendOrderToWhatsapp()"><i class="fab fa-whatsapp"></i> Enviar comprovante pelo WhatsApp</button>
+            <a href="index.html" class="btn btn-lg btn-outline">Voltar à loja</a>
         </div>
     `;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // AÇÃO PRINCIPAL: CONFIRMA O PEDIDO (sem alterações)
@@ -91,7 +147,6 @@ async function sendOrder() {
     const form = document.getElementById('customer-form');
     if (!form || !form.checkValidity()) {
         form.reportValidity();
-        alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
     
@@ -101,9 +156,9 @@ async function sendOrder() {
 
     const user = auth.currentUser;
     if (!user) {
-        alert("Você precisa estar logado para finalizar um pedido.");
+        if (window.openAuthModal) window.openAuthModal();
         confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Confirmar Compra e Pagar';
+        confirmBtn.innerHTML = '<i class="fa-brands fa-pix"></i> Confirmar e pagar com Pix';
         return;
     }
 
@@ -132,7 +187,7 @@ async function sendOrder() {
         console.error("Erro ao salvar o pedido: ", e);
         alert("Houve um erro ao registrar seu pedido. Tente novamente.");
         confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Confirmar Compra e Pagar';
+        confirmBtn.innerHTML = '<i class="fa-brands fa-pix"></i> Confirmar e pagar com Pix';
     }
 }
 
@@ -156,7 +211,7 @@ window.sendOrderToWhatsapp = function() {
                   `*Cliente:* ${lastOrderData.userName}\n\n` +
                   `*Itens do Pedido:*\n${orderDescription}\n\n` +
                   `*Total:* R$ ${lastOrderData.total.toFixed(2).replace('.', ',')}\n\n` +
-                  `Já tenho os dados para o pagamento via PIX. Aguardo a confirmação.`;
+                  `Segue o comprovante do pagamento via Pix. Aguardo a confirmação e o envio do arquivo. 😊`;
 
     // Cria a URL e abre em uma nova aba
     const whatsappUrl = `https://wa.me/551120504970?text=${encodeURIComponent(message)}`;
@@ -180,12 +235,15 @@ function updateCartHeaderInfo() {
     }
 }
 
-window.copyPixKey = function() {
+window.copyPixKey = async function() {
     const pixKeyInput = document.getElementById('pix-key-display');
-    if (pixKeyInput) {
+    if (!pixKeyInput) return;
+    try {
+        await navigator.clipboard.writeText(pixKeyInput.value);
+    } catch (e) {
         pixKeyInput.select();
         pixKeyInput.setSelectionRange(0, 99999);
         document.execCommand('copy');
-        alert('Chave PIX copiada!');
     }
+    if (window.showToast) window.showToast('Chave Pix copiada!'); else alert('Chave PIX copiada!');
 }

@@ -3,160 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todos os Produtos - The Moment</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <meta name="theme-color" content="#febecf">
+    <title>Arquivos de Topo de Bolo para Silhouette (.studio3) - The Moment</title>
+    <meta name="description" content="Catálogo completo de arquivos digitais de topo de bolo no formato .studio3 para Silhouette Studio. A partir de R$ 4,00, pagamento via Pix.">
+    <link rel="canonical" href="https://themomentoficial.shop/produtos.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="The Moment">
+    <meta property="og:title" content="Arquivos de Topo de Bolo para Silhouette (.studio3) - The Moment">
+    <meta property="og:description" content="Catálogo completo de arquivos digitais de topo de bolo no formato .studio3 para Silhouette Studio. A partir de R$ 4,00, pagamento via Pix.">
+    <meta property="og:url" content="https://themomentoficial.shop/produtos.html">
+    <meta property="og:image" content="https://themomentoficial.shop/web-app-manifest-512x512.png">
+    <meta property="og:locale" content="pt_BR">
     <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-      <header class="main-header">
-    <div class="header-logo">
-        <a href="index.html">
-            <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
-        </a>
-    </div>
 
-    <div class="header-search">
-        <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
-        <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
-    </div>
+<div class="announcement-bar">
+    <span><i class="fas fa-scissors"></i>Arquivos .studio3 para Silhouette</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fa-brands fa-pix"></i>Pagamento via Pix</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fab fa-whatsapp"></i>Atendimento pelo WhatsApp</span>
+</div>
 
-    <div class="header-user-actions">
-        <div class="action-item" id="user-actions-container">
-            <i class="fa-regular fa-user"></i>
-            <div class="action-text">
-                <a href="#" id="auth-link">Login | Cadastre-se</a>
-                <div id="user-menu-trigger" class="hidden">
-                    <span id="user-info"></span>
+<header class="main-header">
+    <div class="header-inner">
+        <div class="header-logo">
+            <a href="index.html" aria-label="The Moment — página inicial">
+                <img src="logo-header.png" alt="The Moment Papelaria Criativa" width="308" height="154">
+            </a>
+        </div>
+
+        <div class="header-search" role="search">
+            <input type="search" placeholder="Busque por tema: Sonic, princesa, Mônica..." aria-label="Buscar arquivos">
+            <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
+        </div>
+
+        <div class="header-user-actions">
+            <div class="action-item" id="user-actions-container" role="button" tabindex="0" aria-label="Minha conta">
+                <span class="action-icon"><i class="fa-regular fa-user"></i></span>
+                <div class="action-text">
+                    <small>Olá! Bem-vinda(o)</small>
+                    <a href="#" id="auth-link">Entrar / Cadastrar</a>
+                    <div id="user-menu-trigger" class="hidden"><span id="user-info"></span></div>
                 </div>
             </div>
-        </div>
-        <div id="user-dropdown" class="dropdown-content hidden">
-            <a href="minha-conta.html">Minha Conta</a>
-            <a href="#" id="logout-link">Sair</a>
-        </div>
-        <div class="action-item">
-            <i class="fa-solid fa-bag-shopping"></i>
-            <div class="action-text">
-                <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
-                <span id="cart-total-value">R$ 0,00</span>
+            <div id="user-dropdown" class="dropdown-content hidden">
+                <a href="minha-conta.html"><i class="fa-solid fa-receipt"></i> Meus pedidos</a>
+                <a href="#" id="logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
             </div>
+            <a class="action-item" href="carrinho.html" id="cart-link-header" aria-label="Carrinho">
+                <span class="action-icon"><i class="fa-solid fa-bag-shopping"></i><span class="cart-badge" id="cart-count">0</span></span>
+                <div class="action-text">
+                    <small>Meu carrinho</small>
+                    <span id="cart-total-value">R$ 0,00</span>
+                </div>
+            </a>
         </div>
     </div>
+    <nav class="secondary-nav" aria-label="Menu principal">
+        <a href="index.html">Início</a>
+        <a href="produtos.html" class="active">Arquivos</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="ajuda.html">Dúvidas</a>
+        <a href="#contato">Contato</a>
+    </nav>
 </header>
 
-<nav class="secondary-nav">
-    <a href="index.html">Página Inicial</a>
-    <a href="produtos.html">Produtos</a>
-    <a href="#contato">Contato</a>
-</nav>
+<main class="produtos">
+    <section class="page-hero">
+        <div class="breadcrumb"><a href="index.html">Início</a><span class="sep">/</span><span>Arquivos</span></div>
+        <h1>Todos os Nossos Produtos</h1>
+        <p id="page-subtitle">Arquivos digitais .studio3 prontos para cortar na sua Silhouette.</p>
+    </section>
 
-    <main class="produtos" style="margin-top: 0; min-height: 70vh;">
-    <h1>Todos os Nossos Produtos</h1>
-
-    <div id="category-filters" class="category-filters-container">
-    </div>
-
-    <div class="toolbar">
-        <div class="sort-container">
-            <label for="sort-options">Ordenar por:</label>
-            <select id="sort-options">
-                <option value="title-asc">Nome (A-Z)</option>
-                <option value="title-desc">Nome (Z-A)</option>
-                <option value="price-asc">Preço (Menor para Maior)</option>
-                <option value="price-desc">Preço (Maior para Menor)</option>
-            </select>
-        </div>
-        <button id="clear-sort-btn" class="btn" style="width: auto; padding: 8px 15px; font-size: 14px; display: none;">Limpar Filtros</button>
-    </div>
-    
-    <div id="all-products-list" class="grid">
+    <div class="container">
+        <div class="digital-info-banner">
+            <i class="fas fa-circle-info"></i>
+            <p>Todos os produtos desta página são <strong>arquivos digitais (.studio3)</strong> para cortar na sua Silhouette. <strong>Nenhum item físico é enviado.</strong> Quer o topo pronto? <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer">Veja nossa loja na Shopee</a>.</p>
         </div>
 
-    <div id="pagination-controls" style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
-        <button id="prev-page-btn" class="btn btn-secondary">‹ Página Anterior</button>
-        <button id="next-page-btn" class="btn btn-secondary">Próxima Página ›</button>
-    </div>
+        <div id="category-filters" class="category-filters-container"></div>
 
+        <div class="toolbar">
+            <span class="results-count" id="results-count"></span>
+            <div class="sort-container">
+                <label for="sort-options">Ordenar por</label>
+                <select id="sort-options">
+                    <option value="title-asc">Nome (A-Z)</option>
+                    <option value="title-desc">Nome (Z-A)</option>
+                    <option value="price-asc">Menor preço</option>
+                    <option value="price-desc">Maior preço</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="all-products-list" class="grid">
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+            <div class="skeleton-card"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>
+        </div>
+
+        <div id="pagination-controls" style="display:none">
+            <button id="prev-page-btn" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Anterior</button>
+            <span id="page-info" class="page-info"></span>
+            <button id="next-page-btn" class="btn btn-secondary">Próxima <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
 </main>
 
-    <footer id="contato">
-    <p>The Moment</p>
-    <p>Email: adm@themomentoficial.shop</p>
-    <p>Telefone: (11) 2050-4970</p>
-    <p>Atendimento: De Seg a Sex das 09h às 18h</p>
-
-      <div class="social-icons">
-    <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-        <i class="fab fa-instagram"></i>
-    </a>
-
-    <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    
-    <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" aria-label="Shopee">
-        <i class="fas fa-store"></i>
-    </a>
-<div class="copyright-footer">
-    <p>Copyright The Moment - 2025. Todos os direitos reservados.</p>
-    <p>Desenvolvido por: Rodrigo Lima</p>
-</div>
-
-</div>
-</footer>
-</footer>
-
-    <div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
-        <span class="lightbox-close" onclick="event.stopPropagation(); closeLightbox();">&times;</span>
-        <img class="lightbox-content" id="lightbox-img" onclick="event.stopPropagation()">
-    </div>
-
-    <div id="auth-modal" class="auth-modal hidden">
-        <div class="auth-box">
-            <span class="auth-close" onclick="closeAuthModal()">&times;</span>
-            <div id="login-view">
-                <h2>Login</h2>
-                <form id="login-form" autocomplete="on">
-                    <input type="email" id="login-email" placeholder="E-mail" required>
-                    <input type="password" id="login-password" placeholder="Senha" required minlength="6">
-                    <button type="submit" class="btn">Entrar</button>
-                    <p id="login-error" class="error-message hidden"></p>
-                </form>
-                <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
-            </div>
-            <div id="register-view" class="hidden">
-                <h2>Cadastre-se</h2>
-                <form id="register-form" autocomplete="on">
-                    <input type="email" id="register-email" placeholder="E-mail" required>
-                    <input type="password" id="register-password" placeholder="Senha (mínimo 6 caracteres)" required minlength="6">
-                    <button type="submit" class="btn">Criar Conta</button>
-                    <p id="register-error" class="error-message hidden"></p>
-                </form>
-                <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginView(); return false;">Faça Login</a></p>
+<footer id="contato">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <img src="logo-header.png" alt="The Moment Papelaria Criativa" loading="lazy" width="308" height="154">
+            <p>Há 7 anos transformando sonhos em detalhes únicos. Arquivos de topo de bolo prontos para cortar na sua Silhouette.</p>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" aria-label="Loja na Shopee"><i class="fas fa-store"></i></a>
             </div>
         </div>
+        <div>
+            <h4>Loja</h4>
+            <ul>
+                <li><a href="produtos.html">Todos os arquivos</a></li>
+                <li><a href="produtos.html?categoria=Herois">Heróis</a></li>
+                <li><a href="produtos.html?categoria=Princesas">Princesas</a></li>
+                <li><a href="produtos.html?categoria=Anime">Anime</a></li>
+                <li><a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer">Produtos físicos (Shopee)</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Ajuda</h4>
+            <ul>
+                <li><a href="index.html#como-funciona">Como funciona</a></li>
+                <li><a href="ajuda.html">Dúvidas frequentes</a></li>
+                <li><a href="ajuda.html#trocas">Trocas e reembolso</a></li>
+                <li><a href="ajuda.html#privacidade">Privacidade</a></li>
+                <li><a href="minha-conta.html">Meus pedidos</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Atendimento</h4>
+            <ul>
+                <li><i class="fab fa-whatsapp"></i><a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer">(11) 2050-4970</a></li>
+                <li><i class="fa-regular fa-envelope"></i><a href="mailto:adm@themomentoficial.shop">adm@themomentoficial.shop</a></li>
+                <li><i class="fa-regular fa-clock"></i>Seg a Sex, das 9h às 18h</li>
+            </ul>
+        </div>
     </div>
+    <div class="footer-bottom">
+        <p>© 2026 The Moment · Todos os direitos reservados · Desenvolvido por Rodrigo Lima</p>
+        <span class="pay-chip"><i class="fa-brands fa-pix"></i> Pagamento via Pix</span>
+    </div>
+</footer>
 
 <div class="floating-buttons-container">
-    <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" class="floating-btn instagram-float" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-        <i class="fab fa-instagram"></i>
-    </a>
-    <a href="https://wa.me/551120504970" class="floating-btn whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    <a href="https://wa.me/551120504970" class="floating-btn whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco pelo WhatsApp"><i class="fab fa-whatsapp"></i></a>
 </div>
 
-<script type="module" src="products-data.js"></script>
+<div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="event.stopPropagation(); closeLightbox();" aria-label="Fechar">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" alt="Imagem ampliada" onclick="event.stopPropagation()">
+</div>
+
+<div id="auth-modal" class="auth-modal hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="auth-box">
+        <span class="auth-close" onclick="closeAuthModal()" aria-label="Fechar">&times;</span>
+        <div id="login-view">
+            <h2 id="auth-title">Que bom te ver!</h2>
+            <p class="auth-lead">Entre para finalizar sua compra e acompanhar seus pedidos.</p>
+            <form id="login-form" autocomplete="on">
+                <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                <input type="password" id="login-password" placeholder="Senha" required minlength="6">
+                <button type="submit" class="btn">Entrar</button>
+                <p id="login-error" class="error-message hidden" role="alert"></p>
+            </form>
+            <p class="auth-switch"><a href="#" id="forgot-password-link">Esqueci minha senha</a></p>
+            <p class="auth-switch">Ainda não tem conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se grátis</a></p>
+        </div>
+        <div id="register-view" class="hidden">
+            <h2>Criar conta</h2>
+            <p class="auth-lead">Leva menos de um minuto ✨</p>
+            <form id="signup-form" autocomplete="on">
+                <input type="email" id="signup-email" placeholder="Seu e-mail" required>
+                <input type="password" id="signup-password" placeholder="Crie uma senha (mínimo 6 caracteres)" required minlength="6">
+                <button type="submit" class="btn">Criar minha conta</button>
+                <p id="signup-error" class="error-message hidden" role="alert"></p>
+            </form>
+            <p class="auth-switch">Já tem conta? <a href="#" onclick="showLoginView(); return false;">Entrar</a></p>
+        </div>
+    </div>
+</div>
+
 <script type="module" src="firebase-auth.js"></script>
 <script type="module" src="shared-functions.js"></script>
-<script type="module" src="produtos-page.js"></script>  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script type="module" src="produtos-page.js"></script>
 </body>
 </html>

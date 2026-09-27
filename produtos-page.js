@@ -1,213 +1,167 @@
 import { db } from './firebase-auth.js';
-import { collection, query, orderBy, limit, getDocs, startAfter, where } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { createProductCard, categoryLabel, categoryIcon } from './shared-functions.js';
 
-let productsPerPage = 20;
-let lastVisibleProduct = null;
-let pageHistory = [null];
-let currentPageIndex = 0;
-let isFetching = false;
+// Carrega todos os produtos UMA vez e faz busca, filtro, ordenação e paginação no navegador.
+// Com ~120 produtos isso é mais rápido, gasta menos leituras do Firebase e permite
+// busca sem acento e por parte da palavra ("soni" encontra "Sonic", "monica" encontra "Mônica").
+
+const PRODUCTS_PER_PAGE = 20;
+
+let allProducts = [];
 let searchQuery = '';
 let currentSortOrder = 'title-asc';
 let selectedCategory = null;
+let currentPage = 0;
 
-// <-- AJUSTE AQUI 1: Adicionamos a função da animação "Fly to Cart" -->
-function handleFlyToCart(event) {
-    const button = event.currentTarget;
-    const card = button.closest('.card');
-    if (!card) return;
+const normalize = (text) => String(text || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-    const productImage = card.querySelector('img');
-    const cartIcon = document.getElementById('cart-link-header');
-    if (!productImage || !cartIcon) return;
 
-    const imgClone = productImage.cloneNode(true);
-    imgClone.classList.add('flying-product-img');
-    
-    const productRect = productImage.getBoundingClientRect();
-    const cartRect = cartIcon.getBoundingClientRect();
+function getFilteredProducts() {
+    let list = allProducts;
 
-    document.body.appendChild(imgClone);
-    imgClone.style.top = `${productRect.top}px`;
-    imgClone.style.left = `${productRect.left}px`;
-    imgClone.style.width = `${productRect.width}px`;
-    imgClone.style.height = `${productRect.height}px`;
+    if (searchQuery) {
+        const terms = normalize(searchQuery).split(' ').filter(Boolean);
+        list = list.filter(p => {
+            const haystack = p._search;
+            return terms.every(term => haystack.includes(term));
+        });
+    } else if (selectedCategory) {
+        list = list.filter(p => p.category === selectedCategory);
+    }
 
-    requestAnimationFrame(() => {
-        imgClone.style.top = `${cartRect.top + (cartRect.height / 2)}px`;
-        imgClone.style.left = `${cartRect.left + (cartRect.width / 2)}px`;
-        imgClone.style.width = '25px';
-        imgClone.style.height = '25px';
-        imgClone.style.opacity = '0';
-    });
-
-    setTimeout(() => {
-        imgClone.remove();
-    }, 1000); // Duração da animação (1s), deve ser a mesma do seu CSS
+    const sorted = [...list];
+    switch (currentSortOrder) {
+        case 'title-desc': sorted.sort((a, b) => b.title.localeCompare(a.title, 'pt-BR')); break;
+        case 'price-asc':  sorted.sort((a, b) => a.price - b.price || a.title.localeCompare(b.title, 'pt-BR')); break;
+        case 'price-desc': sorted.sort((a, b) => b.price - a.price || a.title.localeCompare(b.title, 'pt-BR')); break;
+        default:           sorted.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'));
+    }
+    return sorted;
 }
 
-
-async function fetchAndDisplayProducts() {
-    if (isFetching) return;
-    isFetching = true;
-
+function render() {
     const productsList = document.getElementById('all-products-list');
     const paginationControls = document.getElementById('pagination-controls');
     const prevPageBtn = document.getElementById('prev-page-btn');
     const nextPageBtn = document.getElementById('next-page-btn');
-    const pageTitle = document.querySelector('.produtos h1');
-    const toolbar = document.querySelector('.toolbar');
-    
-    productsList.innerHTML = '<p>Carregando produtos...</p>';
-    if (paginationControls) paginationControls.style.display = 'none';
+    const pageInfo = document.getElementById('page-info');
+    const pageTitle = document.querySelector('.page-hero h1');
 
-    try {
-        let finalQuery;
-        
-        if (searchQuery) {
-            if (toolbar) toolbar.style.display = 'none';
-            if (paginationControls) paginationControls.style.display = 'none';
-            pageTitle.textContent = `Resultados para "${searchQuery}"`;
-            const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term);
-            finalQuery = query(collection(db, "products"), where("keywords", "array-contains-any", searchTerms));
-        } else {
-            if (toolbar) toolbar.style.display = 'flex';
-            if (paginationControls) paginationControls.style.display = 'block';
-            pageTitle.textContent = 'Todos os Nossos Produtos';
-            
-            const startAtDoc = pageHistory[currentPageIndex];
-            
-            let sortField = 'title';
-            let sortDirection = 'asc';
-            if (currentSortOrder === 'title-desc') { sortDirection = 'desc'; } 
-            else if (currentSortOrder === 'price-asc') { sortField = 'price'; } 
-            else if (currentSortOrder === 'price-desc') { sortField = 'price'; sortDirection = 'desc'; }
-            
-            let baseQuery;
-            if (selectedCategory) {
-                baseQuery = query(collection(db, "products"), where("category", "==", selectedCategory), orderBy(sortField, sortDirection));
-            } else {
-                baseQuery = query(collection(db, "products"), orderBy(sortField, sortDirection));
-            }
-            
-            if (startAtDoc) {
-                finalQuery = query(baseQuery, startAfter(startAtDoc), limit(productsPerPage));
-            } else {
-                finalQuery = query(baseQuery, limit(productsPerPage));
-            }
-        }
+    const filtered = getFilteredProducts();
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PER_PAGE));
+    if (currentPage > totalPages - 1) currentPage = totalPages - 1;
 
-        const querySnapshot = await getDocs(finalQuery);
-        const products = [];
-        querySnapshot.forEach((doc) => { products.push({ id: doc.id, ...doc.data() }); });
-        productsList.innerHTML = '';
-        lastVisibleProduct = querySnapshot.docs[querySnapshot.docs.length - 1];
-
-        if (products.length === 0) {
-            productsList.innerHTML = `<p>Nenhum produto encontrado.</p>`;
-        } else {
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                // <-- AJUSTE AQUI 2: Adicionamos a classe 'add-to-cart-btn' ao botão -->
-                card.innerHTML = `
-                    <a href="produto-detalhe.html?id=${product.id}" class="card-link">
-                        <img src="${product.image}" alt="${product.title}">
-                        <h3>${product.title}</h3>
-                    </a>
-                    <p>R$ ${Number(product.price).toFixed(2).replace('.', ',')}</p>
-                    <button class="btn add-to-cart-btn">Adicionar ao Carrinho</button>
-                `;
-                
-                // <-- AJUSTE AQUI 3: Modificamos o evento de clique para também chamar a animação -->
-                const addToCartButton = card.querySelector('.add-to-cart-btn');
-                addToCartButton.addEventListener('click', (event) => {
-                    // Mantém sua lógica original de adicionar ao carrinho
-                    if(window.addToCart) {
-                       window.addToCart(event, product);
-                    }
-                    // Dispara a animação
-                    handleFlyToCart(event);
-                });
-
-                productsList.appendChild(card);
-            });
-        }
-        if (!searchQuery) {
-            if (prevPageBtn) prevPageBtn.disabled = (currentPageIndex === 0);
-            if (nextPageBtn) nextPageBtn.disabled = (querySnapshot.docs.length < productsPerPage);
-        }
-    } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
-        productsList.innerHTML = `<p>Ocorreu um erro ao carregar os produtos. Verifique o console.</p>`;
-    } finally {
-        isFetching = false;
+    const subtitle = document.getElementById('page-subtitle');
+    const countEl = document.getElementById('results-count');
+    if (searchQuery) {
+        pageTitle.textContent = `Resultados para "${searchQuery}"`;
+        if (subtitle) subtitle.textContent = 'Arquivos encontrados para a sua busca.';
+    } else if (selectedCategory) {
+        pageTitle.textContent = `Arquivos de ${categoryLabel(selectedCategory)}`;
+        if (subtitle) subtitle.textContent = `Topos de bolo com o tema ${categoryLabel(selectedCategory)}, prontos para cortar na sua Silhouette.`;
+    } else {
+        pageTitle.textContent = 'Todos os arquivos';
+        if (subtitle) subtitle.textContent = 'Arquivos digitais .studio3 prontos para cortar na sua Silhouette.';
     }
+    if (countEl) countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'arquivo encontrado' : 'arquivos encontrados'}`;
+
+    productsList.innerHTML = '';
+    if (filtered.length === 0) {
+        productsList.innerHTML = `
+            <div class="empty-results">
+                <i class="fas fa-magnifying-glass big"></i>
+                <p>Não encontramos nenhum produto${searchQuery ? ` para "<strong></strong>"` : ''}.</p>
+                <p>Não achou o tema que queria? Fale com a gente — podemos ter o arquivo ou criar um novo!</p>
+                <a class="btn" href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i> Pedir pelo WhatsApp</a>
+                ${searchQuery ? '<a class="btn btn-secondary" href="produtos.html">Ver todos os produtos</a>' : ''}
+            </div>`;
+        const strong = productsList.querySelector('strong');
+        if (strong) strong.textContent = searchQuery; // evita injetar HTML do que foi digitado
+    } else {
+        const start = currentPage * PRODUCTS_PER_PAGE;
+        filtered.slice(start, start + PRODUCTS_PER_PAGE).forEach(p => productsList.appendChild(createProductCard(p)));
+    }
+
+    if (paginationControls) paginationControls.style.display = totalPages > 1 ? 'flex' : 'none';
+    if (prevPageBtn) prevPageBtn.disabled = currentPage === 0;
+    if (nextPageBtn) nextPageBtn.disabled = currentPage >= totalPages - 1;
+    if (pageInfo) pageInfo.textContent = `Página ${currentPage + 1} de ${totalPages}`;
 }
 
-async function createCategoryFilters() {
+function createCategoryFilters() {
     const filtersContainer = document.getElementById('category-filters');
     if (!filtersContainer) return;
-    try {
-        const querySnapshot = await getDocs(collection(db, "products"));
-        const categories = new Set();
-        querySnapshot.forEach((doc) => {
-            if (doc.data().category) { categories.add(doc.data().category); }
+
+    const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))]
+        .sort((a, b) => categoryLabel(a).localeCompare(categoryLabel(b), 'pt-BR'));
+    // "Diversos" sempre por último
+    const idx = categories.indexOf('Diversos');
+    if (idx > -1) { categories.splice(idx, 1); categories.push('Diversos'); }
+
+    filtersContainer.innerHTML = '';
+    const makeButton = (category, text) => {
+        const button = document.createElement('button');
+        const icon = document.createElement('i');
+        icon.className = `fas ${category ? categoryIcon(category) : 'fa-border-all'}`;
+        button.append(icon, document.createTextNode(text));
+        if (category === selectedCategory && !searchQuery) button.classList.add('active');
+        button.addEventListener('click', () => {
+            selectedCategory = category;
+            searchQuery = '';
+            currentPage = 0;
+            history.replaceState(null, '', 'produtos.html' + (category ? `?categoria=${encodeURIComponent(category)}` : ''));
+            filtersContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            render();
+            button.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         });
-        filtersContainer.innerHTML = '';
-        const allButton = document.createElement('button');
-        allButton.textContent = 'Ver Todos';
-        allButton.classList.add('active');
-        allButton.addEventListener('click', () => { handleCategoryClick(null, allButton); });
-        filtersContainer.appendChild(allButton);
-        categories.forEach(category => {
-            const button = document.createElement('button');
-            button.textContent = category;
-            button.addEventListener('click', () => { handleCategoryClick(category, button); });
-            filtersContainer.appendChild(button);
-        });
-    } catch (error) {
-        console.error("Erro ao criar filtros de categoria:", error);
-    }
+        filtersContainer.appendChild(button);
+    };
+    makeButton(null, 'Ver Todos');
+    categories.forEach(c => makeButton(c, categoryLabel(c)));
 }
 
-function handleCategoryClick(category, clickedButton) {
-    selectedCategory = category;
-    currentPageIndex = 0;
-    pageHistory = [null];
-    lastVisibleProduct = null;
-    document.querySelectorAll('#category-filters button').forEach(btn => btn.classList.remove('active'));
-    clickedButton.classList.add('active');
-    fetchAndDisplayProducts();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    searchQuery = urlParams.get('search') || '';
-    
+    searchQuery = (urlParams.get('search') || '').trim();
+    selectedCategory = urlParams.get('categoria') || null;
+
+    const searchInput = document.querySelector('.header-search input');
+    if (searchInput && searchQuery) searchInput.value = searchQuery;
+
     const sortOptions = document.getElementById('sort-options');
     if (sortOptions) {
         sortOptions.addEventListener('change', (event) => {
             currentSortOrder = event.target.value;
-            currentPageIndex = 0; pageHistory = [null]; lastVisibleProduct = null;
-            fetchAndDisplayProducts();
+            currentPage = 0;
+            render();
         });
     }
-    
-    const prevPageBtn = document.getElementById('prev-page-btn');
-    const nextPageBtn = document.getElementById('next-page-btn');
-    if(nextPageBtn) nextPageBtn.addEventListener('click', () => {
-        if (lastVisibleProduct && currentPageIndex === pageHistory.length - 1) { pageHistory.push(lastVisibleProduct); }
-        currentPageIndex++;
-        fetchAndDisplayProducts();
-    });
-    if(prevPageBtn) prevPageBtn.addEventListener('click', () => {
-        if (currentPageIndex > 0) {
-            currentPageIndex--; pageHistory.pop();
-            fetchAndDisplayProducts();
-        }
-    });
 
-    createCategoryFilters();
-    fetchAndDisplayProducts();
+    const scrollToTop = () => document.querySelector('.toolbar')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('next-page-btn')?.addEventListener('click', () => { currentPage++; render(); scrollToTop(); });
+    document.getElementById('prev-page-btn')?.addEventListener('click', () => { if (currentPage > 0) { currentPage--; render(); scrollToTop(); } });
+
+    const productsList = document.getElementById('all-products-list');
+
+    try {
+        const snapshot = await getDocs(collection(db, 'products'));
+        allProducts = snapshot.docs.map(doc => {
+            const data = doc.data();
+            const product = { id: doc.id, ...data, price: Number(data.price) || 0, title: data.title || '' };
+            product._search = normalize([product.title, product.category, categoryLabel(product.category), (data.keywords || []).join(' ')].join(' '));
+            return product;
+        });
+        createCategoryFilters();
+        render();
+    } catch (error) {
+        console.error('Erro ao buscar produtos:', error);
+        productsList.innerHTML = '<p>Ocorreu um erro ao carregar os produtos. Atualize a página ou fale com a gente pelo WhatsApp.</p>';
+    }
 });

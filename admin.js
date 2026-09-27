@@ -54,11 +54,13 @@ addProductForm.addEventListener('submit', async (event) => {
     const imageUrl = document.getElementById('product-image-url').value;
     const category = document.getElementById('product-category').value;
     const isFeatured = document.getElementById('product-featured').checked;
+    const description = (document.getElementById('product-description')?.value || '').trim();
     const normalizedTitle = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const keywords = normalizedTitle.split(' ');
+    const keywords = normalizedTitle.split(' ').filter(word => word && word !== '-');
     const productData = {
         title: name, price: price, image: imageUrl,
-        featured: isFeatured, category: category, keywords: keywords
+        featured: isFeatured, category: category, keywords: keywords,
+        description: description
     };
     try {
         if (currentlyEditingId) {
@@ -128,6 +130,8 @@ async function handleEditClick(event) {
             document.getElementById('product-image-url').value = product.image;
             document.getElementById('product-category').value = product.category || "";
             document.getElementById('product-featured').checked = product.featured || false;
+            const descriptionField = document.getElementById('product-description');
+            if (descriptionField) descriptionField.value = product.description || '';
             
             // Troca a visibilidade das telas
             addView.classList.remove('hidden');

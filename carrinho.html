@@ -3,145 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#febecf">
     <title>Seu Carrinho - The Moment</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="manifest" href="site.webmanifest">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="cart-page-body">
+<body>
 
-    <header class="main-header">
+<div class="announcement-bar">
+    <span><i class="fas fa-scissors"></i>Arquivos .studio3 para Silhouette</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fa-brands fa-pix"></i>Pagamento via Pix</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fab fa-whatsapp"></i>Atendimento pelo WhatsApp</span>
+</div>
+
+<header class="main-header">
+    <div class="header-inner">
         <div class="header-logo">
-            <a href="index.html">
-                <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/transparent-Photoroom.png?raw=true" alt="Logo The Moment" />
+            <a href="index.html" aria-label="The Moment — página inicial">
+                <img src="logo-header.png" alt="The Moment Papelaria Criativa" width="308" height="154">
             </a>
         </div>
+
+        <div class="header-search" role="search">
+            <input type="search" placeholder="Busque por tema: Sonic, princesa, Mônica..." aria-label="Buscar arquivos">
+            <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
+        </div>
+
         <div class="header-user-actions">
-            <div class="action-item" id="user-actions-container">
-                <i class="fa-regular fa-user"></i>
+            <div class="action-item" id="user-actions-container" role="button" tabindex="0" aria-label="Minha conta">
+                <span class="action-icon"><i class="fa-regular fa-user"></i></span>
                 <div class="action-text">
-                    <a href="#" id="auth-link">Login | Cadastre-se</a>
-                    <div id="user-menu-trigger" class="hidden">
-                        <span id="user-info"></span>
-                    </div>
+                    <small>Olá! Bem-vinda(o)</small>
+                    <a href="#" id="auth-link">Entrar / Cadastrar</a>
+                    <div id="user-menu-trigger" class="hidden"><span id="user-info"></span></div>
                 </div>
             </div>
             <div id="user-dropdown" class="dropdown-content hidden">
-                <a href="minha-conta.html">Minha Conta</a>
-                <a href="#" id="logout-link">Sair</a>
+                <a href="minha-conta.html"><i class="fa-solid fa-receipt"></i> Meus pedidos</a>
+                <a href="#" id="logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
             </div>
-            <div class="action-item">
-                <i class="fa-solid fa-bag-shopping"></i>
+            <a class="action-item" href="carrinho.html" id="cart-link-header" aria-label="Carrinho">
+                <span class="action-icon"><i class="fa-solid fa-bag-shopping"></i><span class="cart-badge" id="cart-count">0</span></span>
                 <div class="action-text">
-                    <a href="carrinho.html" id="cart-link-header">Carrinho (<span id="cart-count">0</span>)</a>
+                    <small>Meu carrinho</small>
                     <span id="cart-total-value">R$ 0,00</span>
                 </div>
-            </div>
+            </a>
         </div>
-    </header>
-
-    <div class="search-nav-container">
-        <div class="header-search">
-            <input type="text" placeholder="O que você está buscando?" aria-label="Busca" />
-            <button type="button" aria-label="Buscar"><i class="fas fa-search"></i></button>
-        </div>
-        <nav class="secondary-nav">
-            <a href="index.html">Página Inicial</a>
-            <a href="produtos.html">Produtos</a>
-            <a href="index.html#contato">Contato</a>
-        </nav>
     </div>
+    <nav class="secondary-nav" aria-label="Menu principal">
+        <a href="index.html">Início</a>
+        <a href="produtos.html">Arquivos</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="ajuda.html">Dúvidas</a>
+        <a href="#contato">Contato</a>
+    </nav>
+</header>
 
-    <main>
-        <div class="cart-page-container">
+<main>
+    <section class="page-hero">
+        <div class="breadcrumb"><a href="index.html">Início</a><span class="sep">/</span><span>Carrinho</span></div>
+        <h1>Seu carrinho</h1>
+        <p>Revise seus arquivos e finalize em poucos passos.</p>
+    </section>
+    <div class="container">
+        <div class="cart-page-container"></div>
+    </div>
+</main>
+
+<footer id="contato">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <img src="logo-header.png" alt="The Moment Papelaria Criativa" loading="lazy" width="308" height="154">
+            <p>Há 7 anos transformando sonhos em detalhes únicos. Arquivos de topo de bolo prontos para cortar na sua Silhouette.</p>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" aria-label="Loja na Shopee"><i class="fas fa-store"></i></a>
             </div>
-    </main>
-    
-    <footer id="contato">
-    <p>The Moment</p>
-    <p>Email: adm@themomentoficial.shop</p>
-    <p>Telefone: (11) 2050-4970</p>
-    <p>Atendimento: De Seg a Sex das 09h às 18h</p>
-
-      <div class="social-icons">
-    <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-        <i class="fab fa-instagram"></i>
-    </a>
-
-    <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    
-    <a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer" aria-label="Shopee">
-        <i class="fas fa-store"></i>
-    </a>
-<div class="copyright-footer">
-    <p>Copyright The Moment - 2025. Todos os direitos reservados.</p>
-    <p>Desenvolvido por: Rodrigo Lima</p>
-</div>
-
-</div>
+        </div>
+        <div>
+            <h4>Loja</h4>
+            <ul>
+                <li><a href="produtos.html">Todos os arquivos</a></li>
+                <li><a href="produtos.html?categoria=Herois">Heróis</a></li>
+                <li><a href="produtos.html?categoria=Princesas">Princesas</a></li>
+                <li><a href="produtos.html?categoria=Anime">Anime</a></li>
+                <li><a href="https://shopee.com.br/the_momentofc" target="_blank" rel="noopener noreferrer">Produtos físicos (Shopee)</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Ajuda</h4>
+            <ul>
+                <li><a href="index.html#como-funciona">Como funciona</a></li>
+                <li><a href="ajuda.html">Dúvidas frequentes</a></li>
+                <li><a href="ajuda.html#trocas">Trocas e reembolso</a></li>
+                <li><a href="ajuda.html#privacidade">Privacidade</a></li>
+                <li><a href="minha-conta.html">Meus pedidos</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Atendimento</h4>
+            <ul>
+                <li><i class="fab fa-whatsapp"></i><a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer">(11) 2050-4970</a></li>
+                <li><i class="fa-regular fa-envelope"></i><a href="mailto:adm@themomentoficial.shop">adm@themomentoficial.shop</a></li>
+                <li><i class="fa-regular fa-clock"></i>Seg a Sex, das 9h às 18h</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 The Moment · Todos os direitos reservados · Desenvolvido por Rodrigo Lima</p>
+        <span class="pay-chip"><i class="fa-brands fa-pix"></i> Pagamento via Pix</span>
+    </div>
 </footer>
-</footer>
 
-    <div id="pix-instructions" class="pix-modal hidden">
-        <div class="pix-box">
-            <h2>Pagamento via PIX</h2>
-            <p>Seu pedido <strong id="order-id"></strong> foi registrado!</p>
-            <p>Para confirmar, realize o pagamento no valor de <strong id="pix-value"></strong> para a chave abaixo:</p>
-            <img src="https://github.com/rlima16/The-Moment-Papelaria/blob/main/qr-code-pix.png?raw=true" alt="QR Code PIX" style="max-width: 200px; margin: 15px 0;">
-            <p><strong>Chave PIX (E-mail):</strong></p>
-            <input type="text" id="pix-key" value="adm@themomentoficial.shop" readonly>
-            <button class="btn" onclick="copyPixKey()">Copiar Chave</button>
-            <p style="margin-top: 20px;">Após o pagamento, seu pedido será processado.</p>
-            <a href="index.html" style="font-size: 14px; color: #555;">Voltar à Loja</a>
-        </div>
-    </div>
-
-    <div id="auth-modal" class="auth-modal hidden" role="dialog" aria-modal="true">
-        <div class="auth-box">
-            <span class="auth-close" onclick="closeAuthModal()" aria-label="Fechar">&times;</span>
-            <div id="login-view">
-                <h2>Login</h2>
-                <form id="login-form" autocomplete="on">
-                    <input type="email" id="login-email" placeholder="E-mail" required />
-                    <input type="password" id="login-password" placeholder="Senha" required minlength="6" />
-                    <button type="submit" class="btn">Entrar</button>
-                    <p id="login-error" class="error-message hidden" role="alert"></p>
-                </form>
-                <p class="auth-switch" style="text-align: right; margin-top: -5px; font-size: 13px;">
-                    <a href="#" id="forgot-password-link">Esqueci a senha</a>
-                </p>
-                <p class="auth-switch">Não tem uma conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se</a></p>
-            </div>
-            <div id="register-view" class="hidden">
-                <h2>Cadastre-se</h2>
-                <form id="signup-form" autocomplete="on">
-                    <input type="email" id="signup-email" placeholder="E-mail" required />
-                    <input type="password" id="signup-password" placeholder="Senha (mínimo 6 caracteres)" required minlength="6" />
-                    <button type="submit" class="btn">Criar Conta</button>
-                    <p id="signup-error" class="error-message hidden" role="alert"></p>
-                </form>
-                <p class="auth-switch">Já tem uma conta? <a href="#" onclick="showLoginView(); return false;">Faça Login</a></p>
-            </div>
-        </div>
-    </div>
 <div class="floating-buttons-container">
-    <a href="https://www.instagram.com/t_h_e_m_o_m_e_n_t/" class="floating-btn instagram-float" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-        <i class="fab fa-instagram"></i>
-    </a>
-    <a href="https://wa.me/551120504970" class="floating-btn whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    <a href="https://wa.me/551120504970" class="floating-btn whatsapp-float" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="Fale conosco pelo WhatsApp"><i class="fab fa-whatsapp"></i></a>
 </div>
-    <script type="module" src="firebase-auth.js"></script>
-    <script type="module" src="shared-functions.js"></script>
-    <script type="module" src="cart-page.js"></script>
+
+<div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="event.stopPropagation(); closeLightbox();" aria-label="Fechar">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" alt="Imagem ampliada" onclick="event.stopPropagation()">
+</div>
+
+<div id="auth-modal" class="auth-modal hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="auth-box">
+        <span class="auth-close" onclick="closeAuthModal()" aria-label="Fechar">&times;</span>
+        <div id="login-view">
+            <h2 id="auth-title">Que bom te ver!</h2>
+            <p class="auth-lead">Entre para finalizar sua compra e acompanhar seus pedidos.</p>
+            <form id="login-form" autocomplete="on">
+                <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                <input type="password" id="login-password" placeholder="Senha" required minlength="6">
+                <button type="submit" class="btn">Entrar</button>
+                <p id="login-error" class="error-message hidden" role="alert"></p>
+            </form>
+            <p class="auth-switch"><a href="#" id="forgot-password-link">Esqueci minha senha</a></p>
+            <p class="auth-switch">Ainda não tem conta? <a href="#" onclick="showRegisterView(); return false;">Cadastre-se grátis</a></p>
+        </div>
+        <div id="register-view" class="hidden">
+            <h2>Criar conta</h2>
+            <p class="auth-lead">Leva menos de um minuto ✨</p>
+            <form id="signup-form" autocomplete="on">
+                <input type="email" id="signup-email" placeholder="Seu e-mail" required>
+                <input type="password" id="signup-password" placeholder="Crie uma senha (mínimo 6 caracteres)" required minlength="6">
+                <button type="submit" class="btn">Criar minha conta</button>
+                <p id="signup-error" class="error-message hidden" role="alert"></p>
+            </form>
+            <p class="auth-switch">Já tem conta? <a href="#" onclick="showLoginView(); return false;">Entrar</a></p>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="firebase-auth.js"></script>
+<script type="module" src="shared-functions.js"></script>
+<script type="module" src="cart-page.js"></script>
 </body>
 </html>
