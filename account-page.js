@@ -1,6 +1,33 @@
 import { auth, db } from './firebase-auth.js';
 import { collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
+// Retorno do Mercado Pago: mostra aviso e esvazia o carrinho
+const retornoPagamento = new URLSearchParams(window.location.search).get('pagamento');
+if (retornoPagamento === 'aprovado' || retornoPagamento === 'pendente') {
+    try { sessionStorage.removeItem('shoppingCart'); } catch (e) { /* ignora */ }
+    document.addEventListener('DOMContentLoaded', () => {
+        const count = document.getElementById('cart-count');
+        if (count) { count.textContent = '0'; count.classList.add('hidden'); }
+        const total = document.getElementById('cart-total-value');
+        if (total) total.textContent = 'R$ 0,00';
+        const container = document.querySelector('.account-page-container');
+        if (!container) return;
+        const box = document.createElement('div');
+        box.className = 'payment-return ' + (retornoPagamento === 'aprovado' ? 'ok' : 'wait');
+        box.innerHTML = retornoPagamento === 'aprovado'
+            ? '<i class="fas fa-circle-check"></i><div><strong>Pagamento aprovado! 🎉</strong><p>Obrigada pela compra. Em breve enviaremos seu arquivo. Se quiser agilizar, <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer">chame no WhatsApp</a>.</p></div>'
+            : '<i class="fas fa-hourglass-half"></i><div><strong>Pagamento em processamento</strong><p>Assim que o Mercado Pago confirmar, o status do pedido muda aqui automaticamente.</p></div>';
+        container.prepend(box);
+    });
+}
+
+const statusClass = (status) => {
+    const s = String(status || '').toLowerCase();
+    if (s === 'pago' || s === 'entregue') return 'ok';
+    if (s.includes('recusado') || s.includes('cancelado')) return 'bad';
+    return 'wait';
+};
+
 // Observa o estado de autenticação
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -51,7 +78,7 @@ async function fetchUserOrders(userId) {
                         <span>Data: <strong>${orderDate}</strong></span>
                     </div>
                     <div class="order-body">
-                        <p><strong>Status:</strong> ${order.status}</p>
+                        <p><strong>Status:</strong> <span class="status-badge ${statusClass(order.status)}">${order.status}</span>${order.paymentMethod ? ` · ${order.paymentMethod}` : ''}</p>
                         <p><strong>Total:</strong> R$ ${Number(order.total).toFixed(2).replace('.', ',')}</p>
                         <p><strong>Itens:</strong></p>
                         <ul>${itemsList}</ul>

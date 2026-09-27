@@ -133,7 +133,7 @@ export function createProductCard(product) {
             <h3></h3>
         </a>
         <div class="card-footer">
-            <div class="card-price"><strong>${formatPrice(product.price)}</strong><small>no Pix</small></div>
+            <div class="card-price"><strong>${formatPrice(product.price)}</strong><small>à vista</small></div>
             <button class="btn add-to-cart-btn${inCart ? ' in-cart' : ''}" data-add-id="${product.id}">
                 ${inCart ? '<i class="fas fa-check"></i> No carrinho' : '<i class="fa-solid fa-bag-shopping"></i> Adicionar'}
             </button>

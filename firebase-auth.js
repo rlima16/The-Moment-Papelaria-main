@@ -26,7 +26,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Exporta para outros scripts
-export { auth, db, collection, addDoc, serverTimestamp };
+export { app, auth, db, collection, addDoc, serverTimestamp };
 
 // --- GERENCIADOR DE ESTADO DO USUÁRIO ---
 onAuthStateChanged(auth, (user) => {

@@ -1,6 +1,10 @@
 // cart-page.js ATUALIZADO NOVAMENTE
 
-import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js';
+import { app, auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js';
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-functions.js";
+
+const functions = getFunctions(app, 'southamerica-east1');
+const criarPagamento = httpsCallable(functions, 'criarPagamento');
 
 let cart = [];
 let lastOrderData = null; // Esta variável vai guardar os dados do último pedido
@@ -13,6 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
 auth.onAuthStateChanged(() => {
     if (!lastOrderData) renderCartView();
 });
+
+// Voltou do Mercado Pago sem concluir o pagamento
+if (new URLSearchParams(window.location.search).get('pagamento') === 'falhou') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => window.showToast && window.showToast('O pagamento não foi concluído. Você pode tentar de novo ou escolher outra forma.'), 400);
+    });
+}
 
 function loadCartFromSession() {
     const cartData = sessionStorage.getItem('shoppingCart');
@@ -85,9 +96,29 @@ function renderCartView() {
                     <div class="form-group"><label for="email">E-mail para contato</label><input type="email" id="email" name="email" autocomplete="email" value="${escapeHtml(auth.currentUser?.email || '')}" required></div>
                     <div class="form-group"><label for="cpf">CPF</label><input type="text" id="cpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required></div>
                     <p class="form-privacy-note">Seus dados são usados apenas para identificar o pedido. Veja nossa <a href="ajuda.html#privacidade">política de privacidade</a>.</p>
+
+                    <div class="form-group">
+                        <label>Forma de pagamento</label>
+                        <div class="payment-options">
+                            <label class="payment-option">
+                                <input type="radio" name="pagamento" value="mercadopago" checked>
+                                <span class="po-body">
+                                    <strong><i class="fa-regular fa-credit-card"></i> Cartão de crédito, débito ou Pix</strong>
+                                    <small>Pagamento seguro pelo Mercado Pago · confirmação automática</small>
+                                </span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="pagamento" value="pix-manual">
+                                <span class="po-body">
+                                    <strong><i class="fa-brands fa-pix"></i> Pix pela chave (manual)</strong>
+                                    <small>Você paga e envia o comprovante pelo WhatsApp</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
                 </form>
-                <button type="button" id="confirm-order-btn" class="btn btn-lg"><i class="fa-brands fa-pix"></i> Confirmar e pagar com Pix</button>
-                <p class="secure-note"><i class="fas fa-lock"></i> Seus dados ficam protegidos</p>
+                <button type="button" id="confirm-order-btn" class="btn btn-lg"><i class="fas fa-lock"></i> Ir para o pagamento</button>
+                <p class="secure-note"><i class="fas fa-lock"></i> Os dados do cartão são digitados no ambiente seguro do Mercado Pago</p>
             </div>
         </div>`;
 
@@ -158,7 +189,27 @@ async function sendOrder() {
     if (!user) {
         if (window.openAuthModal) window.openAuthModal();
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = '<i class="fa-brands fa-pix"></i> Confirmar e pagar com Pix';
+        confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Ir para o pagamento';
+        return;
+    }
+
+    const metodo = (document.querySelector('input[name="pagamento"]:checked') || {}).value || 'mercadopago';
+    if (metodo === 'mercadopago') {
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Abrindo o Mercado Pago...';
+        try {
+            const result = await criarPagamento({
+                itemIds: cart.map(item => item.id).filter(Boolean),
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value,
+                cpf: document.getElementById('cpf').value
+            });
+            window.location.href = result.data.checkoutUrl;
+        } catch (e) {
+            console.error('Erro ao iniciar pagamento:', e);
+            if (window.showToast) window.showToast(e.message || 'Não foi possível abrir o pagamento. Tente novamente.');
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Ir para o pagamento';
+        }
         return;
     }
 
@@ -187,7 +238,7 @@ async function sendOrder() {
         console.error("Erro ao salvar o pedido: ", e);
         alert("Houve um erro ao registrar seu pedido. Tente novamente.");
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = '<i class="fa-brands fa-pix"></i> Confirmar e pagar com Pix';
+        confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Ir para o pagamento';
     }
 }
 
