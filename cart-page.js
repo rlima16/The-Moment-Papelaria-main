@@ -9,11 +9,10 @@ async function criarPagamento(dados) {
     if (PAYMENT_API_URL.includes('COLE-AQUI')) {
         throw new Error('Pagamento com cartão ainda não configurado. Escolha "Pix pela chave".');
     }
-    const idToken = await auth.currentUser.getIdToken();
     const resp = await fetch(`${PAYMENT_API_URL}/criar-pagamento`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...dados, idToken })
+        body: JSON.stringify(dados)
     });
     const data = await resp.json().catch(() => ({}));
     if (!resp.ok || !data.checkoutUrl) throw new Error(data.error || 'Não foi possível abrir o pagamento. Tente novamente.');
@@ -211,11 +210,28 @@ async function sendOrder() {
     if (metodo === 'mercadopago') {
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Abrindo o Mercado Pago...';
         try {
+            // 1) registra o pedido (igual ao Pix) para ele aparecer em "Minha conta"
+            const pedido = {
+                userId: user.uid,
+                userName: document.getElementById('nome').value,
+                userEmail: document.getElementById('email').value,
+                userCpf: document.getElementById('cpf').value,
+                orderId: "TM-" + Date.now(),
+                items: [...cart],
+                total: cart.reduce((sum, item) => sum + Number(item.price), 0),
+                status: "Aguardando Pagamento",
+                paymentMethod: "Mercado Pago",
+                createdAt: serverTimestamp()
+            };
+            const ref = await addDoc(collection(db, "pedidos"), pedido);
+            // 2) pede ao servidor o link de pagamento do Mercado Pago
             const result = await criarPagamento({
+                orderDocId: ref.id,
+                orderId: pedido.orderId,
                 itemIds: cart.map(item => item.id).filter(Boolean),
-                nome: document.getElementById('nome').value,
-                email: document.getElementById('email').value,
-                cpf: document.getElementById('cpf').value
+                nome: pedido.userName,
+                email: pedido.userEmail,
+                cpf: pedido.userCpf
             });
             window.location.href = result.checkoutUrl;
         } catch (e) {

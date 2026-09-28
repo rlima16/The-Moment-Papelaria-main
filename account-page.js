@@ -16,7 +16,7 @@ if (retornoPagamento === 'aprovado' || retornoPagamento === 'pendente') {
         box.className = 'payment-return ' + (retornoPagamento === 'aprovado' ? 'ok' : 'wait');
         box.innerHTML = retornoPagamento === 'aprovado'
             ? '<i class="fas fa-circle-check"></i><div><strong>Pagamento aprovado! 🎉</strong><p>Obrigada pela compra. Em breve enviaremos seu arquivo. Se quiser agilizar, <a href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer">chame no WhatsApp</a>.</p></div>'
-            : '<i class="fas fa-hourglass-half"></i><div><strong>Pagamento em processamento</strong><p>Assim que o Mercado Pago confirmar, o status do pedido muda aqui automaticamente.</p></div>';
+            : '<i class="fas fa-hourglass-half"></i><div><strong>Pagamento em processamento</strong><p>Assim que o Mercado Pago confirmar, atualizamos o status do seu pedido.</p></div>';
         container.prepend(box);
     });
 }

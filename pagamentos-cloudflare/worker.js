@@ -7,9 +7,10 @@
  *   POST /webhook          -> recebe o aviso do Mercado Pago e atualiza o pedido
  *
  * Segredos (Cloudflare > Worker > Settings > Variables and Secrets):
- *   MP_ACCESS_TOKEN     Access Token do Mercado Pago (TEST-... ou APP_USR-...)
- *   MP_WEBHOOK_SECRET   Assinatura secreta do webhook do Mercado Pago
- *   FIREBASE_SA         Conteúdo do arquivo JSON da conta de serviço do Firebase
+ *   MP_ACCESS_TOKEN     OBRIGATÓRIO. Access Token do Mercado Pago (TEST-... ou APP_USR-...)
+ *   FIREBASE_SA         Opcional. JSON da conta de serviço do Firebase: liga a
+ *                       atualização automática do status do pedido (webhook)
+ *   MP_WEBHOOK_SECRET   Opcional. Assinatura secreta do webhook do Mercado Pago
  */
 
 const PROJECT_ID = 'the-moment-b3e02';
@@ -147,36 +148,35 @@ async function fsUpdate(env, path, obj) {
   }
 }
 
-// Confere o login do cliente (token do Firebase Authentication)
-async function verifyUser(idToken) {
-  if (!idToken) throw new HttpError(401, 'Entre na sua conta para finalizar a compra.');
-  const resp = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken }),
-  });
+// ------------------------------------------------------------ criar pagamento
+// Lê um produto. Com a conta de serviço usa acesso de servidor; sem ela, usa a leitura
+// pública (a mesma que o site usa para mostrar os produtos).
+async function getProduct(env, id) {
+  const path = `products/${encodeURIComponent(id)}`;
+  if (env.FIREBASE_SA) return fsGet(env, path);
+  const resp = await fetch(`${FS_BASE}/${path}?key=${FIREBASE_API_KEY}`);
+  if (resp.status === 404) return null;
   const data = await resp.json();
-  const user = data.users && data.users[0];
-  if (!resp.ok || !user) throw new HttpError(401, 'Sua sessão expirou. Entre na conta novamente.');
-  return { uid: user.localId, email: user.email || '' };
+  if (!resp.ok) throw new HttpError(500, 'Erro ao ler os produtos: ' + JSON.stringify(data.error || data));
+  return { id, ...fromFields(data.fields) };
 }
 
-// ------------------------------------------------------------ criar pagamento
 async function criarPagamento(request, env) {
-  if (!env.MP_ACCESS_TOKEN) throw new HttpError(500, 'Pagamento com cartão indisponível no momento.');
+  if (!env.MP_ACCESS_TOKEN) throw new HttpError(500, 'Pagamento com cartão indisponível no momento (falta o MP_ACCESS_TOKEN).');
   const body = await request.json().catch(() => ({}));
-  const user = await verifyUser(body.idToken);
 
+  const orderDocId = String(body.orderDocId || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
+  const orderId = String(body.orderId || '').slice(0, 40);
   const nome = String(body.nome || '').trim().slice(0, 120);
   const email = String(body.email || '').trim().slice(0, 160);
   const cpf = String(body.cpf || '').replace(/\D/g, '');
   const ids = Array.isArray(body.itemIds) ? [...new Set(body.itemIds.map(String))].slice(0, 50) : [];
-  if (!nome || !email.includes('@') || cpf.length !== 11 || !ids.length) {
+  if (!orderDocId || !nome || !email.includes('@') || cpf.length !== 11 || !ids.length) {
     throw new HttpError(400, 'Confira nome, e-mail, CPF e os itens do carrinho.');
   }
 
-  // Preços SEMPRE lidos do banco
-  const products = await Promise.all(ids.map((id) => fsGet(env, `products/${encodeURIComponent(id)}`)));
+  // Preços SEMPRE lidos do banco (nunca do navegador)
+  const products = await Promise.all(ids.map((id) => getProduct(env, id)));
   const items = products.filter(Boolean).map((p) => ({
     id: p.id,
     title: String(p.title || 'Arquivo digital'),
@@ -184,21 +184,6 @@ async function criarPagamento(request, env) {
     image: p.image || '',
   })).filter((i) => i.price > 0);
   if (!items.length) throw new HttpError(400, 'Nenhum produto válido no carrinho.');
-
-  const total = Math.round(items.reduce((s, i) => s + i.price, 0) * 100) / 100;
-  const orderId = 'TM-' + Date.now();
-  const docId = await fsCreate(env, 'pedidos', {
-    userId: user.uid,
-    userName: nome,
-    userEmail: email,
-    userCpf: cpf,
-    orderId,
-    items,
-    total,
-    status: 'Aguardando Pagamento',
-    paymentMethod: 'Mercado Pago',
-    createdAt: new Date(),
-  });
 
   const origin = new URL(request.url).origin;
   const preference = {
@@ -213,8 +198,7 @@ async function criarPagamento(request, env) {
       unit_price: i.price,
     })),
     payer: { name: nome, email, identification: { type: 'CPF', number: cpf } },
-    external_reference: docId,
-    notification_url: `${origin}/webhook`,
+    external_reference: orderDocId,
     back_urls: {
       success: `${SITE_URL}/minha-conta.html?pagamento=aprovado`,
       pending: `${SITE_URL}/minha-conta.html?pagamento=pendente`,
@@ -223,26 +207,29 @@ async function criarPagamento(request, env) {
     auto_return: 'approved',
     statement_descriptor: 'THEMOMENT',
     payment_methods: { excluded_payment_types: [{ id: 'ticket' }], installments: 3 },
-    metadata: { order_id: orderId },
+    metadata: { order_id: orderId, order_doc_id: orderDocId },
   };
+  // Atualização automática do pedido só quando a chave do Firebase estiver configurada
+  if (env.FIREBASE_SA) preference.notification_url = `${origin}/webhook`;
 
   const resp = await fetch(`${MP_API}/checkout/preferences`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env.MP_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
-      'X-Idempotency-Key': docId,
+      'X-Idempotency-Key': orderDocId,
     },
     body: JSON.stringify(preference),
   });
   const pref = await resp.json();
   if (!resp.ok || !pref.init_point) {
     console.error('Erro ao criar preferência', resp.status, JSON.stringify(pref));
-    await fsUpdate(env, `pedidos/${docId}`, { status: 'Cancelado' });
     throw new HttpError(502, 'Não foi possível iniciar o pagamento. Tente novamente.');
   }
-  await fsUpdate(env, `pedidos/${docId}`, { mpPreferenceId: String(pref.id) });
-  return { checkoutUrl: pref.init_point, orderId };
+  if (env.FIREBASE_SA) {
+    try { await fsUpdate(env, `pedidos/${orderDocId}`, { mpPreferenceId: String(pref.id) }); } catch (e) { console.warn(e.message); }
+  }
+  return { checkoutUrl: pref.init_point };
 }
 
 // --------------------------------------------------------------------- webhook
