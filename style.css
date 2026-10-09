@@ -1076,3 +1076,14 @@ footer li i { width: 18px; color: var(--plum-900); margin-right: 6px; }
 .empty-files i { font-size: 44px; color: var(--blush-300); margin-bottom: 10px; }
 .file-group input[type="file"] { padding: 10px; background: var(--white); border-style: dashed; }
 .file-status { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+
+/* ---------- Tela do Pix na própria loja ---------- */
+.pix-payment-view .success-icon .fa-pix { font-size: 30px; }
+.pix-payment-view .success-icon.ok { background: #eafaf0; color: #1e8a4a; }
+.pix-qr { width: 230px; max-width: 80%; margin: 18px auto; border-radius: 16px; border: 1px solid var(--line); padding: 10px; background: var(--white); }
+.pix-how { text-align: left; max-width: 440px; margin: 0 auto 18px; padding-left: 22px; color: var(--plum-700); font-size: 14px; line-height: 1.6; }
+.pix-checking { margin: 18px 0 6px; font-weight: 700; color: var(--pink-700); }
+.pix-back { display: inline-block; margin-top: 8px; font-weight: 800; }
+.pix-approved h1 { color: #1e6b3a; }
+.pix-approved p { color: var(--plum-700); margin-bottom: 20px; }
+.pix-approved .btn { margin: 6px; }

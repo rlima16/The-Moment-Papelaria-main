@@ -1,6 +1,6 @@
 // cart-page.js ATUALIZADO NOVAMENTE
 
-import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261009';
+import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261010';
 
 // 👇 Endereço do servidor de pagamentos (Cloudflare Worker). Troque depois de publicar o Worker.
 const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
@@ -19,8 +19,20 @@ async function criarPagamento(dados) {
     return data;
 }
 
+async function postApi(caminho, dados) {
+    const resp = await fetch(`${PAYMENT_API_URL}${caminho}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.error || 'Não foi possível concluir agora. Tente novamente.');
+    return data;
+}
+
 let cart = [];
-let lastOrderData = null; // Esta variável vai guardar os dados do último pedido
+let lastOrderData = null; // pedido em andamento (tela do Pix)
+let pixTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadCartFromSession();
@@ -114,10 +126,17 @@ function renderCartView() {
                         <label>Forma de pagamento</label>
                         <div class="payment-options">
                             <label class="payment-option">
-                                <input type="radio" name="pagamento" value="mercadopago" checked>
+                                <input type="radio" name="pagamento" value="pix" checked>
                                 <span class="po-body">
-                                    <strong><i class="fa-regular fa-credit-card"></i> Cartão de crédito, débito ou Pix</strong>
-                                    <small>Pagamento seguro pelo Mercado Pago · o topo é liberado na hora na sua área do cliente</small>
+                                    <strong><i class="fa-brands fa-pix"></i> Pix</strong>
+                                    <small>QR Code aqui mesmo · aprovação em segundos · topo liberado na hora</small>
+                                </span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="pagamento" value="cartao">
+                                <span class="po-body">
+                                    <strong><i class="fa-regular fa-credit-card"></i> Cartão de crédito ou débito</strong>
+                                    <small>Pagamento seguro pelo Mercado Pago · topo liberado na hora</small>
                                 </span>
                             </label>
                         </div>
@@ -137,46 +156,91 @@ function renderCartView() {
     updateCartHeaderInfo();
 }
 
-// TELA 2: PAGAMENTO PIX
-function renderPixPaymentView() {
+// TELA 2: PIX NA PRÓPRIA LOJA (QR Code + confirmação automática)
+function renderPixScreen(pix) {
     const container = document.querySelector('.cart-page-container');
     if (!container || !lastOrderData) return;
-
     const hero = document.querySelector('.page-hero');
     if (hero) hero.classList.add('hidden');
 
     container.innerHTML = `
-        <div class="panel pix-payment-view">
-            <div class="success-icon"><i class="fas fa-check"></i></div>
-            <h1>Pedido registrado!</h1>
-            <p>Pedido <strong>${escapeHtml(lastOrderData.orderId)}</strong>. Agora é só pagar via Pix:</p>
-            <div class="pix-amount">${fmt(lastOrderData.total)}</div>
-
-            <img src="pix.png" alt="QR Code Pix">
-
-            <div class="pix-key-container">
-                <p style="margin:0"><strong>Ou use a chave Pix (e-mail):</strong></p>
-                <div class="input-group">
-                    <input type="text" id="pix-key-display" value="adm@themomentoficial.shop" readonly>
-                    <button class="btn-copy" onclick="copyPixKey()"><i class="fa-regular fa-copy"></i> Copiar</button>
-                </div>
-            </div>
-
-            <div class="next-steps">
-                <h2>Como receber seu arquivo</h2>
-                <ol>
-                    <li>Pague o valor acima via Pix (QR Code ou chave).</li>
-                    <li>Clique no botão abaixo e envie o <strong>comprovante</strong> pelo WhatsApp.</li>
-                    <li>Assim que confirmarmos o pagamento, enviamos seu arquivo. Atendimento de segunda a sexta, das 9h às 18h.</li>
+        <div class="panel pix-payment-view" id="pix-view">
+            <div class="pix-step" id="pix-waiting">
+                <div class="success-icon"><i class="fa-brands fa-pix"></i></div>
+                <h1>Pague ${fmt(pix.valor)} com Pix</h1>
+                <p>Pedido <strong>${escapeHtml(lastOrderData.orderId)}</strong> · válido por <strong id="pix-countdown">30:00</strong></p>
+                ${pix.qrCodeBase64 ? `<img class="pix-qr" src="data:image/png;base64,${pix.qrCodeBase64}" alt="QR Code Pix">` : ''}
+                <ol class="pix-how">
+                    <li>Abra o app do seu banco e escolha <strong>Pix → Ler QR Code</strong> ou <strong>Pix Copia e Cola</strong>.</li>
+                    <li>Pague o valor de <strong>${fmt(pix.valor)}</strong>.</li>
+                    <li>Pronto! Esta tela muda sozinha quando o pagamento for aprovado.</li>
                 </ol>
-                <p>Acompanhe o status em <a href="/minha-conta">Minha conta</a>.</p>
+                <div class="pix-key-container">
+                    <p style="margin:0"><strong>Pix Copia e Cola:</strong></p>
+                    <div class="input-group">
+                        <input type="text" id="pix-code" value="${escapeHtml(pix.qrCode)}" readonly>
+                        <button class="btn-copy" id="pix-copy"><i class="fa-regular fa-copy"></i> Copiar</button>
+                    </div>
+                </div>
+                <p class="pix-checking"><i class="fas fa-spinner fa-spin"></i> Aguardando o pagamento...</p>
+                <a href="/" class="pix-back">Voltar para o site</a>
             </div>
-
-            <button type="button" class="btn btn-lg btn-whatsapp" onclick="sendOrderToWhatsapp()"><i class="fab fa-whatsapp"></i> Enviar comprovante pelo WhatsApp</button>
-            <a href="/" class="btn btn-lg btn-outline">Voltar à loja</a>
         </div>
     `;
+    document.getElementById('pix-copy').addEventListener('click', copiarCodigoPix);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // contador de validade
+    const fim = Date.now() + 30 * 60 * 1000;
+    const countdown = document.getElementById('pix-countdown');
+    const tick = setInterval(() => {
+        const rest = Math.max(0, fim - Date.now());
+        if (countdown) countdown.textContent = `${String(Math.floor(rest / 60000)).padStart(2, '0')}:${String(Math.floor(rest / 1000) % 60).padStart(2, '0')}`;
+        if (!rest) clearInterval(tick);
+    }, 1000);
+
+    // confere o pagamento a cada 4 segundos
+    clearInterval(pixTimer);
+    pixTimer = setInterval(async () => {
+        try {
+            const result = await postApi('/status', { ids: [lastOrderData.docId] });
+            const info = result[lastOrderData.docId];
+            if (info && info.status === 'Pago') {
+                clearInterval(pixTimer); clearInterval(tick);
+                pagamentoAprovado();
+            } else if (info && ['Cancelado', 'Pagamento recusado'].includes(info.status)) {
+                clearInterval(pixTimer);
+                document.querySelector('.pix-checking').innerHTML = 'O Pix expirou ou foi cancelado. <a href="/carrinho">Gerar um novo</a>';
+            }
+        } catch (e) { /* tenta de novo no próximo ciclo */ }
+    }, 4000);
+}
+
+function pagamentoAprovado() {
+    cart = [];
+    try { sessionStorage.removeItem('shoppingCart'); } catch (e) { /* ignora */ }
+    updateCartHeaderInfo();
+    const badge = document.getElementById('cart-count');
+    if (badge) badge.classList.add('hidden');
+    const view = document.getElementById('pix-view');
+    if (!view) return;
+    view.innerHTML = `
+        <div class="pix-step pix-approved">
+            <div class="success-icon ok"><i class="fas fa-check"></i></div>
+            <h1>Pagamento aprovado! 🎉</h1>
+            <p>Obrigada pela compra! Seu topo já está liberado na sua área do cliente, pronto para baixar.</p>
+            <a href="/minha-conta" class="btn btn-lg"><i class="fa-solid fa-download"></i> Baixar meus topos</a>
+            <a href="/" class="btn btn-lg btn-outline">Voltar para o site</a>
+        </div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function copiarCodigoPix() {
+    const input = document.getElementById('pix-code');
+    if (!input) return;
+    try { await navigator.clipboard.writeText(input.value); }
+    catch (e) { input.select(); input.setSelectionRange(0, 99999); document.execCommand('copy'); }
+    window.showToast && window.showToast('Código Pix copiado! Cole no app do seu banco.');
 }
 
 // AÇÃO PRINCIPAL: CONFIRMA O PEDIDO (sem alterações)
@@ -199,67 +263,47 @@ async function sendOrder() {
         return;
     }
 
-    const metodo = (document.querySelector('input[name="pagamento"]:checked') || {}).value || 'mercadopago';
-    if (metodo === 'mercadopago') {
-        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Abrindo o Mercado Pago...';
-        try {
-            // 1) registra o pedido (igual ao Pix) para ele aparecer em "Minha conta"
-            const pedido = {
-                userId: user.uid,
-                userName: document.getElementById('nome').value,
-                userEmail: document.getElementById('email').value,
-                userCpf: document.getElementById('cpf').value,
-                orderId: "TM-" + Date.now(),
-                items: [...cart],
-                total: cart.reduce((sum, item) => sum + Number(item.price), 0),
-                status: "Aguardando Pagamento",
-                paymentMethod: "Mercado Pago",
-                createdAt: serverTimestamp()
-            };
-            const ref = await addDoc(collection(db, "pedidos"), pedido);
-            // 2) pede ao servidor o link de pagamento do Mercado Pago
-            const result = await criarPagamento({
-                orderDocId: ref.id,
-                orderId: pedido.orderId,
-                itemIds: cart.map(item => item.id).filter(Boolean),
-                nome: pedido.userName,
-                email: pedido.userEmail,
-                cpf: pedido.userCpf
-            });
-            window.location.href = result.checkoutUrl;
-        } catch (e) {
-            console.error('Erro ao iniciar pagamento:', e);
-            if (window.showToast) window.showToast(e.message || 'Não foi possível abrir o pagamento. Tente novamente.');
-            confirmBtn.disabled = false;
-            confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Ir para o pagamento';
-        }
-        return;
-    }
-
-    lastOrderData = {
-        userId: user.uid,
-        userName: document.getElementById('nome').value,
-        userEmail: document.getElementById('email').value,
-        userCpf: document.getElementById('cpf').value,
-        orderId: "TM-" + Date.now(),
-        items: [...cart],
-        total: cart.reduce((sum, item) => sum + Number(item.price), 0),
-        status: "Aguardando Pagamento",
-        createdAt: serverTimestamp()
-    };
-    
+    const metodo = (document.querySelector('input[name="pagamento"]:checked') || {}).value || 'pix';
+    confirmBtn.innerHTML = metodo === 'pix'
+        ? '<i class="fas fa-spinner fa-spin"></i> Gerando o Pix...'
+        : '<i class="fas fa-spinner fa-spin"></i> Abrindo o Mercado Pago...';
     try {
-        await addDoc(collection(db, "pedidos"), lastOrderData);
-        
-        cart = [];
-        sessionStorage.removeItem('shoppingCart');
-        updateCartHeaderInfo();
-        
-        renderPixPaymentView();
-
+        // 1) registra o pedido para ele aparecer na área do cliente
+        const pedido = {
+            userId: user.uid,
+            userName: document.getElementById('nome').value,
+            userEmail: document.getElementById('email').value,
+            userCpf: document.getElementById('cpf').value,
+            orderId: "TM-" + Date.now(),
+            items: [...cart],
+            total: cart.reduce((sum, item) => sum + Number(item.price), 0),
+            status: "Aguardando Pagamento",
+            paymentMethod: "Mercado Pago",
+            paymentType: metodo === 'pix' ? 'Pix' : 'Cartão',
+            createdAt: serverTimestamp()
+        };
+        const ref = await addDoc(collection(db, "pedidos"), pedido);
+        const dados = {
+            orderDocId: ref.id,
+            orderId: pedido.orderId,
+            itemIds: cart.map(item => item.id).filter(Boolean),
+            nome: pedido.userName,
+            email: pedido.userEmail,
+            cpf: pedido.userCpf
+        };
+        if (metodo === 'pix') {
+            // 2a) Pix: QR Code aqui mesmo, e a tela muda sozinha quando pagar
+            const pix = await postApi('/pix', dados);
+            lastOrderData = { ...pedido, docId: ref.id };
+            renderPixScreen(pix);
+        } else {
+            // 2b) Cartão: página segura do Mercado Pago
+            const result = await criarPagamento(dados);
+            window.location.href = result.checkoutUrl;
+        }
     } catch (e) {
-        console.error("Erro ao salvar o pedido: ", e);
-        alert("Houve um erro ao registrar seu pedido. Tente novamente.");
+        console.error('Erro ao iniciar pagamento:', e);
+        if (window.showToast) window.showToast(e.message || 'Não foi possível iniciar o pagamento. Tente novamente.');
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Ir para o pagamento';
     }
@@ -267,31 +311,6 @@ async function sendOrder() {
 
 
 // --- FUNÇÕES AUXILIARES ---
-
-// NOVA FUNÇÃO PARA ENVIAR O PEDIDO VIA WHATSAPP
-window.sendOrderToWhatsapp = function() {
-    if (!lastOrderData) {
-        console.error("Dados do pedido não encontrados para enviar via WhatsApp.");
-        alert("Erro: não foi possível encontrar os dados do pedido.");
-        return;
-    }
-
-    // Monta a descrição dos itens
-    let orderDescription = lastOrderData.items.map(item => `- ${item.title} (R$ ${Number(item.price).toFixed(2).replace('.',',')})`).join('\n');
-    
-    // Monta a mensagem completa
-    let message = `Olá! 👋 Gostaria de solicitar o meu pedido:\n\n` +
-                  `*Nº do Pedido:* ${lastOrderData.orderId}\n` +
-                  `*Cliente:* ${lastOrderData.userName}\n\n` +
-                  `*Itens do Pedido:*\n${orderDescription}\n\n` +
-                  `*Total:* R$ ${lastOrderData.total.toFixed(2).replace('.', ',')}\n\n` +
-                  `Segue o comprovante do pagamento via Pix. Aguardo a confirmação e o envio do arquivo. 😊`;
-
-    // Cria a URL e abre em uma nova aba
-    const whatsappUrl = `https://wa.me/551120504970?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-}
-
 
 window.removeFromCart = function(itemIndex) {
     cart.splice(itemIndex, 1);
@@ -307,17 +326,4 @@ function updateCartHeaderInfo() {
         cartCount.textContent = cart.length;
         cartTotalValue.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     }
-}
-
-window.copyPixKey = async function() {
-    const pixKeyInput = document.getElementById('pix-key-display');
-    if (!pixKeyInput) return;
-    try {
-        await navigator.clipboard.writeText(pixKeyInput.value);
-    } catch (e) {
-        pixKeyInput.select();
-        pixKeyInput.setSelectionRange(0, 99999);
-        document.execCommand('copy');
-    }
-    if (window.showToast) window.showToast('Chave Pix copiada!'); else alert('Chave PIX copiada!');
 }

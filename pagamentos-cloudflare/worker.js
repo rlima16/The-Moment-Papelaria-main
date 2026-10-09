@@ -215,7 +215,7 @@ async function criarPagamento(request, env) {
     },
     auto_return: 'approved',
     statement_descriptor: 'THEMOMENT',
-    payment_methods: { excluded_payment_types: [{ id: 'ticket' }], installments: 3 },
+    payment_methods: { excluded_payment_types: [{ id: 'ticket' }, { id: 'bank_transfer' }, { id: 'atm' }], installments: 3 },
     metadata: { order_id: orderId, order_doc_id: orderDocId },
   };
   // Atualização automática do pedido só quando a chave do Firebase estiver configurada
@@ -306,6 +306,77 @@ async function webhook(request, env) {
   });
   return new Response('ok', { status: 200 });
 }
+
+// ------------------------------------------------------------ Pix direto
+// Cria o pagamento Pix pela API e devolve o QR Code para o site mostrar na própria tela.
+async function criarPix(request, env) {
+  if (!env.MP_ACCESS_TOKEN) throw new HttpError(500, 'Pagamento indisponível no momento (falta o MP_ACCESS_TOKEN).');
+  const body = await request.json().catch(() => ({}));
+  const orderDocId = cleanIdPix(body.orderDocId);
+  const orderId = String(body.orderId || '').slice(0, 40);
+  const nome = String(body.nome || '').trim().slice(0, 120);
+  const email = String(body.email || '').trim().slice(0, 160);
+  const cpf = String(body.cpf || '').replace(/\D/g, '');
+  const ids = Array.isArray(body.itemIds) ? [...new Set(body.itemIds.map(String))].slice(0, 50) : [];
+  if (!orderDocId || !nome || !email.includes('@') || cpf.length !== 11 || !ids.length) {
+    throw new HttpError(400, 'Confira nome, e-mail, CPF e os itens do carrinho.');
+  }
+
+  // Preços lidos do banco. A chave de idempotência (pix-<pedido>) evita gerar dois Pix para o mesmo pedido.
+  const products = await Promise.all(ids.map((id) => getProduct(env, id)));
+  const items = products.filter(Boolean).map((p) => ({
+    id: p.id, title: String(p.title || 'Arquivo digital'), price: Number(p.price) || 0,
+  })).filter((i) => i.price > 0);
+  if (!items.length) throw new HttpError(400, 'Nenhum produto válido no carrinho.');
+  const total = Math.round(items.reduce((s, i) => s + i.price, 0) * 100) / 100;
+
+  const expira = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
+  const partes = nome.split(/\s+/);
+  const pagamento = {
+    transaction_amount: total,
+    description: items.length === 1 ? items[0].title.slice(0, 200) : `${items.length} arquivos digitais - The Moment`,
+    payment_method_id: 'pix',
+    external_reference: orderDocId,
+    date_of_expiration: expira.toISOString().replace('Z', '+00:00'),
+    statement_descriptor: 'THEMOMENT',
+    payer: {
+      email,
+      first_name: partes[0],
+      last_name: partes.slice(1).join(' ') || partes[0],
+      identification: { type: 'CPF', number: cpf },
+    },
+    additional_info: {
+      items: items.map((i) => ({ id: i.id, title: i.title.slice(0, 250), quantity: 1, unit_price: i.price, category_id: 'others' })),
+    },
+    metadata: { order_id: orderId, order_doc_id: orderDocId },
+  };
+  if (env.FIREBASE_SA) pagamento.notification_url = `${new URL(request.url).origin}/webhook`;
+
+  const resp = await fetch(`${MP_API}/v1/payments`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.MP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+      'X-Idempotency-Key': `pix-${orderDocId}`,
+    },
+    body: JSON.stringify(pagamento),
+  });
+  const pay = await resp.json().catch(() => ({}));
+  const tx = pay.point_of_interaction && pay.point_of_interaction.transaction_data;
+  if (!resp.ok || !tx || !tx.qr_code) {
+    console.error('Erro ao criar Pix', resp.status, JSON.stringify(pay));
+    throw new HttpError(502, 'Não foi possível gerar o Pix agora. Tente novamente.');
+  }
+  return {
+    paymentId: String(pay.id),
+    status: pay.status,
+    valor: total,
+    qrCode: tx.qr_code,
+    qrCodeBase64: tx.qr_code_base64,
+    expiraEm: pay.date_of_expiration || expira.toISOString(),
+  };
+}
+const cleanIdPix = (v) => String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
 
 // ------------------------------------------------------- consultar status
 // Pergunta ao Mercado Pago a situação de até 50 pedidos (pelo id do pedido no site).
@@ -456,6 +527,9 @@ export default {
         return json(await criarPagamento(request, env), 200, request);
       }
       const url = new URL(request.url);
+      if (request.method === 'POST' && pathname === '/pix') {
+        return json(await criarPix(request, env), 200, request);
+      }
       if (request.method === 'POST' && pathname === '/admin/arquivo') {
         return json(await enviarArquivo(request, env, url), 200, request);
       }
