@@ -1,6 +1,6 @@
 import { db } from './firebase-auth.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-import { createProductCard, categoryLabel, categoryIcon } from './shared-functions.js';
+import { createProductCard, categoryLabel, categoryIcon, categoryGroup } from './shared-functions.js';
 
 // Carrega todos os produtos UMA vez e faz busca, filtro, ordenação e paginação no navegador.
 // Com ~120 produtos isso é mais rápido, gasta menos leituras do Firebase e permite
@@ -32,7 +32,7 @@ function getFilteredProducts() {
             return terms.every(term => haystack.includes(term));
         });
     } else if (selectedCategory) {
-        list = list.filter(p => p.category === selectedCategory);
+        list = list.filter(p => categoryGroup(p.category) === selectedCategory);
     }
 
     const sorted = [...list];
@@ -98,7 +98,7 @@ function createCategoryFilters() {
     const filtersContainer = document.getElementById('category-filters');
     if (!filtersContainer) return;
 
-    const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))]
+    const categories = [...new Set(allProducts.map(p => categoryGroup(p.category)).filter(Boolean))]
         .sort((a, b) => categoryLabel(a).localeCompare(categoryLabel(b), 'pt-BR'));
     // "Diversos" sempre por último
     const idx = categories.indexOf('Diversos');
@@ -130,7 +130,7 @@ function createCategoryFilters() {
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     searchQuery = (urlParams.get('search') || '').trim();
-    selectedCategory = urlParams.get('categoria') || null;
+    selectedCategory = urlParams.get('categoria') ? categoryGroup(urlParams.get('categoria')) : null;
 
     const searchInput = document.querySelector('.header-search input');
     if (searchInput && searchQuery) searchInput.value = searchQuery;

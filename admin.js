@@ -167,7 +167,8 @@ async function handleEditClick(event) {
             document.getElementById('product-name').value = product.title;
             document.getElementById('product-price').value = product.price;
             document.getElementById('product-image-url').value = product.image;
-            document.getElementById('product-category').value = product.category || "";
+            const cat = product.category || "";
+            document.getElementById('product-category').value = (cat === 'Disney' || cat === 'Turma da Monica') ? 'Personagens' : cat;
             document.getElementById('product-featured').checked = product.featured || false;
             const descriptionField = document.getElementById('product-description');
             if (descriptionField) descriptionField.value = product.description || '';

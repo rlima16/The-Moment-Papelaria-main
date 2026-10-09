@@ -1,6 +1,6 @@
 import { db } from './firebase-auth.js';
 import { doc, getDoc, collection, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-import { createProductCard, formatPrice, categoryLabel, isInCart } from './shared-functions.js';
+import { createProductCard, formatPrice, categoryLabel, categoryGroup, isInCart } from './shared-functions.js';
 
 /**
  * Produtos relacionados: prioriza a mesma categoria e completa com outros.
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const link = document.getElementById('product-category-link');
             chip.textContent = categoryLabel(product.category);
             link.textContent = categoryLabel(product.category);
-            link.href = `/produtos?categoria=${encodeURIComponent(product.category)}`;
+            link.href = `/produtos?categoria=${encodeURIComponent(categoryGroup(product.category))}`;
         }
 
         const wa = document.getElementById('whatsapp-question');

@@ -20,16 +20,18 @@ export const CATEGORY_INFO = {
     'Herois':          { label: 'Heróis',          icon: 'fa-mask' },
     'Princesas':       { label: 'Princesas',       icon: 'fa-crown' },
     'Anime':           { label: 'Anime',           icon: 'fa-dragon' },
-    'Disney':          { label: 'Disney',          icon: 'fa-wand-magic-sparkles' },
-    'Turma da Monica': { label: 'Turma da Mônica', icon: 'fa-children' },
+    'Personagens':     { label: 'Personagens',     icon: 'fa-wand-magic-sparkles' },
     'Desenhos':        { label: 'Desenhos',        icon: 'fa-palette' },
     'Jogos':           { label: 'Jogos',           icon: 'fa-gamepad' },
     'Carros':          { label: 'Carros',          icon: 'fa-car-side' },
     'Cha de Bebe':     { label: 'Chá de Bebê',     icon: 'fa-baby' },
     'Diversos':        { label: 'Diversos',        icon: 'fa-cake-candles' },
 };
-export const categoryLabel = (c) => (CATEGORY_INFO[c] && CATEGORY_INFO[c].label) || c || '';
-export const categoryIcon = (c) => (CATEGORY_INFO[c] && CATEGORY_INFO[c].icon) || 'fa-star';
+// Categorias antigas do banco que aparecem juntas no site como "Personagens"
+const CATEGORY_GROUPS = { 'Disney': 'Personagens', 'Turma da Monica': 'Personagens' };
+export const categoryGroup = (c) => CATEGORY_GROUPS[c] || c;
+export const categoryLabel = (c) => { const g = categoryGroup(c); return (CATEGORY_INFO[g] && CATEGORY_INFO[g].label) || g || ''; };
+export const categoryIcon = (c) => { const g = categoryGroup(c); return (CATEGORY_INFO[g] && CATEGORY_INFO[g].icon) || 'fa-star'; };
 
 export const isInCart = (id) => cart.some(item => item.id === id);
 
