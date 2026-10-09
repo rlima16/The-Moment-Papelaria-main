@@ -1,6 +1,6 @@
-import { db } from './firebase-auth.js';
+import { db } from './firebase-auth.js?v=20261009';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-import { createProductCard, categoryLabel, categoryIcon, categoryGroup } from './shared-functions.js';
+import { createProductCard, categoryLabel, categoryIcon, categoryGroup } from './shared-functions.js?v=20261009';
 
 // Carrega todos os produtos UMA vez e faz busca, filtro, ordenação e paginação no navegador.
 // Com ~120 produtos isso é mais rápido, gasta menos leituras do Firebase e permite
