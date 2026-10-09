@@ -335,33 +335,6 @@ async function consultarStatus(request, env) {
   return result;
 }
 
-// ------------------------------------------------------------ diagnóstico
-// GET /diagnostico?pedido=<id do pedido>&pagamento=<nº da operação>
-// Mostra só ids e status (sem dados pessoais), para conferir a ligação pedido <-> pagamento.
-async function diagnostico(url, env) {
-  const out = { tokenTipo: env.MP_ACCESS_TOKEN ? env.MP_ACCESS_TOKEN.split('-')[0] : 'FALTANDO' };
-  const H = { headers: { Authorization: `Bearer ${env.MP_ACCESS_TOKEN}` } };
-  const pedido = (url.searchParams.get('pedido') || '').replace(/[^A-Za-z0-9_-]/g, '');
-  const pagamento = (url.searchParams.get('pagamento') || '').replace(/\D/g, '');
-  if (pedido) {
-    const r = await fetch(`${MP_API}/v1/payments/search?external_reference=${pedido}&sort=date_created&criteria=desc&limit=10`, H);
-    const d = await r.json().catch(() => ({}));
-    out.buscaPorPedido = { http: r.status, total: d.paging ? d.paging.total : null, erro: d.message || null,
-      resultados: (d.results || []).map((p) => ({ id: p.id, status: p.status, external_reference: p.external_reference, live_mode: p.live_mode })) };
-  }
-  if (pagamento) {
-    const r = await fetch(`${MP_API}/v1/payments/${pagamento}`, H);
-    const p = await r.json().catch(() => ({}));
-    out.pagamento = { http: r.status, erro: p.message || null, id: p.id, status: p.status, external_reference: p.external_reference,
-      live_mode: p.live_mode, valor: p.transaction_amount, criado: p.date_created };
-  }
-  const r = await fetch(`${MP_API}/v1/payments/search?sort=date_created&criteria=desc&limit=5`, H);
-  const d = await r.json().catch(() => ({}));
-  out.ultimosPagamentos = { http: r.status, total: d.paging ? d.paging.total : null, erro: d.message || null,
-    resultados: (d.results || []).map((p) => ({ id: p.id, status: p.status, external_reference: p.external_reference, valor: p.transaction_amount, criado: p.date_created })) };
-  return out;
-}
-
 // ----------------------------------------------------------------- roteamento
 export default {
   async fetch(request, env) {
@@ -376,9 +349,6 @@ export default {
       }
       if (request.method === 'POST' && pathname === '/webhook') {
         return await webhook(request, env);
-      }
-      if (request.method === 'GET' && pathname === '/diagnostico') {
-        return json(await diagnostico(new URL(request.url), env), 200, request);
       }
       if (request.method === 'GET' && pathname === '/') {
         return new Response('Servidor de pagamentos The Moment: online ✅', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
