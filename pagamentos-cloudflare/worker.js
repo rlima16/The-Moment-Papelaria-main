@@ -16,7 +16,12 @@
 const PROJECT_ID = 'the-moment-b3e02';
 const FIREBASE_API_KEY = 'AIzaSyBhiNkiR7D_xI_W_2L2bLUG3gC1--HUn18'; // chave pública do site
 const SITE_URL = 'https://lojathemoment.shop';
-const ALLOWED_ORIGINS = [SITE_URL, 'https://www.lojathemoment.shop', 'https://themomentoficial.shop', 'https://www.themomentoficial.shop', 'http://localhost:5500', 'http://127.0.0.1:5500'];
+const ALLOWED_ORIGINS = [
+  SITE_URL, 'https://www.lojathemoment.shop',
+  'http://lojathemoment.shop', 'http://www.lojathemoment.shop', // enquanto o HTTPS não estiver forçado
+  'https://themomentoficial.shop', 'https://www.themomentoficial.shop',
+  'http://localhost:5500', 'http://127.0.0.1:5500',
+];
 const MP_API = 'https://api.mercadopago.com';
 const FS_BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
