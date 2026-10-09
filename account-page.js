@@ -1,6 +1,6 @@
 // account-page.js — Área do cliente: topos comprados (baixar / visualizar) e histórico de pedidos
 
-import { auth, db } from './firebase-auth.js?v=20261011';
+import { auth, db } from './firebase-auth.js?v=20261012';
 import { collection, query, where, getDocs, orderBy, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
 // Servidor de pagamentos e arquivos (Cloudflare)

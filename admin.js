@@ -1,6 +1,6 @@
 // admin.js (VERSÃO FINAL CORRIGIDA)
 
-import { auth, db } from './firebase-auth.js?v=20261011';
+import { auth, db } from './firebase-auth.js?v=20261012';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, getDoc, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 

@@ -1,6 +1,6 @@
 // cart-page.js ATUALIZADO NOVAMENTE
 
-import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261011';
+import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261012';
 
 // 👇 Endereço do servidor de pagamentos (Cloudflare Worker). Troque depois de publicar o Worker.
 const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
@@ -300,8 +300,18 @@ async function copiarCodigoPix() {
 }
 
 // AÇÃO PRINCIPAL: CONFIRMA O PEDIDO (sem alterações)
+// Confere os dígitos verificadores do CPF
+function cpfValido(valor) {
+    const cpf = String(valor || '').replace(/\D/g, '');
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf) || cpf === '12345678909') return false;
+    const dv = (n) => { let s = 0; for (let i = 0; i < n; i++) s += Number(cpf[i]) * (n + 1 - i); const r = (s * 10) % 11; return r === 10 ? 0 : r; };
+    return dv(9) === Number(cpf[9]) && dv(10) === Number(cpf[10]);
+}
+
 async function sendOrder() {
     const form = document.getElementById('customer-form');
+    const cpfInput = document.getElementById('cpf');
+    if (cpfInput) cpfInput.setCustomValidity(cpfInput.value && !cpfValido(cpfInput.value) ? 'CPF inválido. Confira os números.' : '');
     if (!form || !form.checkValidity()) {
         form.reportValidity();
         return;

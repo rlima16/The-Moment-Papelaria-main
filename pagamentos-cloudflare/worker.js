@@ -343,13 +343,14 @@ async function criarPix(request, env) {
       email,
       first_name: partes[0],
       last_name: partes.slice(1).join(' ') || partes[0],
-      identification: { type: 'CPF', number: cpf },
     },
     additional_info: {
       items: items.map((i) => ({ id: i.id, title: i.title.slice(0, 250), quantity: 1, unit_price: i.price, category_id: 'others' })),
     },
     metadata: { order_id: orderId, order_doc_id: orderDocId },
   };
+  // CPF só vai junto se for válido (no Pix ele é opcional; um CPF errado faria o Mercado Pago recusar)
+  if (cpfValido(cpf)) pagamento.payer.identification = { type: 'CPF', number: cpf };
   if (env.FIREBASE_SA) pagamento.notification_url = `${new URL(request.url).origin}/webhook`;
 
   const resp = await fetch(`${MP_API}/v1/payments`, {
@@ -376,6 +377,12 @@ async function criarPix(request, env) {
     qrCodeBase64: tx.qr_code_base64,
     expiraEm: pay.date_of_expiration || expira.toISOString(),
   };
+}
+// Confere os dígitos verificadores do CPF
+function cpfValido(cpf) {
+  if (!/^\d{11}$/.test(cpf) || /^(\d)\1{10}$/.test(cpf) || cpf === '12345678909') return false;
+  const dv = (n) => { let s = 0; for (let i = 0; i < n; i++) s += Number(cpf[i]) * (n + 1 - i); const r = (s * 10) % 11; return r === 10 ? 0 : r; };
+  return dv(9) === Number(cpf[9]) && dv(10) === Number(cpf[10]);
 }
 const cleanIdPix = (v) => String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
 
