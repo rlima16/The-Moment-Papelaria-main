@@ -1,5 +1,9 @@
 import { auth, db } from './firebase-auth.js';
-import { collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+// Mesmo endereço usado no carrinho (servidor de pagamentos no Cloudflare)
+const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
+const FINAL_STATUSES = ['pago', 'entregue', 'cancelado', 'reembolsado'];
 
 // Retorno do Mercado Pago: mostra aviso e esvazia o carrinho
 const retornoPagamento = new URLSearchParams(window.location.search).get('pagamento');
@@ -44,41 +48,43 @@ auth.onAuthStateChanged(user => {
     }
 });
 
+const escapeHtml = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
 async function fetchUserOrders(userId) {
     const historyContainer = document.getElementById('order-history-container');
     const noOrdersMessage = document.getElementById('no-orders-message');
-    
-    // Cria uma consulta ao Firestore para buscar pedidos do usuário logado, ordenados pelo mais recente
-    const ordersRef = collection(db, "pedidos");
-    const q = query(ordersRef, where("userId", "==", userId), orderBy("createdAt", "desc"));
+
+    // Pedidos do usuário logado, do mais recente para o mais antigo
+    const q = query(collection(db, "pedidos"), where("userId", "==", userId), orderBy("createdAt", "desc"));
 
     try {
         const querySnapshot = await getDocs(q);
         if (querySnapshot.empty) {
-            // Se não encontrar pedidos, mostra a mensagem
             noOrdersMessage.classList.remove('hidden');
             return;
         }
 
         let ordersHtml = '';
-        querySnapshot.forEach(doc => {
-            const order = doc.data();
-            const orderDate = order.createdAt.toDate().toLocaleDateString('pt-BR');
-            
-            // Cria a lista de itens do pedido
-            const itemsList = order.items.map(item => 
-                `<li>${item.title} - R$ ${Number(item.price).toFixed(2).replace('.', ',')}</li>`
+        const paraConsultar = [];
+        querySnapshot.forEach(d => {
+            const order = d.data();
+            const orderDate = order.createdAt && order.createdAt.toDate ? order.createdAt.toDate().toLocaleDateString('pt-BR') : '';
+            const itemsList = (order.items || []).map(item =>
+                `<li>${escapeHtml(item.title)} - R$ ${Number(item.price).toFixed(2).replace('.', ',')}</li>`
             ).join('');
 
-            // Monta o card de cada pedido
+            if (order.paymentMethod === 'Mercado Pago' && !FINAL_STATUSES.includes(String(order.status || '').toLowerCase())) {
+                paraConsultar.push(d.id);
+            }
+
             ordersHtml += `
-                <div class="order-card">
+                <div class="order-card" data-order-id="${d.id}">
                     <div class="order-header">
-                        <span>Pedido: <strong>${order.orderId}</strong></span>
+                        <span>Pedido: <strong>${escapeHtml(order.orderId)}</strong></span>
                         <span>Data: <strong>${orderDate}</strong></span>
                     </div>
                     <div class="order-body">
-                        <p><strong>Status:</strong> <span class="status-badge ${statusClass(order.status)}">${order.status}</span>${order.paymentMethod ? ` · ${order.paymentMethod}` : ''}</p>
+                        <p><strong>Status:</strong> <span class="status-badge ${statusClass(order.status)}">${escapeHtml(order.status)}</span>${order.paymentMethod ? ` · ${escapeHtml(order.paymentMethod)}` : ''}</p>
                         <p><strong>Total:</strong> R$ ${Number(order.total).toFixed(2).replace('.', ',')}</p>
                         <p><strong>Itens:</strong></p>
                         <ul>${itemsList}</ul>
@@ -88,9 +94,37 @@ async function fetchUserOrders(userId) {
         });
 
         historyContainer.innerHTML = ordersHtml;
+        if (paraConsultar.length) atualizarStatusMercadoPago(paraConsultar);
 
     } catch (error) {
         console.error("Erro ao buscar pedidos:", error);
         historyContainer.innerHTML = "<p>Ocorreu um erro ao carregar seus pedidos. Tente novamente mais tarde.</p>";
+    }
+}
+
+// Pergunta ao Mercado Pago se os pedidos já foram pagos e atualiza a tela (e o pedido)
+async function atualizarStatusMercadoPago(ids) {
+    try {
+        const resp = await fetch(`${PAYMENT_API_URL}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids })
+        });
+        if (!resp.ok) return;
+        const result = await resp.json();
+        for (const id of ids) {
+            const info = result[id];
+            if (!info || !info.status) continue;
+            const badge = document.querySelector(`[data-order-id="${id}"] .status-badge`);
+            if (badge) {
+                badge.textContent = info.status;
+                badge.className = `status-badge ${statusClass(info.status)}`;
+            }
+            try {
+                await updateDoc(doc(db, "pedidos", id), { status: info.status, mpPaymentId: info.mpPaymentId || '' });
+            } catch (e) { /* sem permissão para gravar: a tela já mostra o status certo */ }
+        }
+    } catch (e) {
+        console.warn('Não foi possível consultar o Mercado Pago agora.', e);
     }
 }

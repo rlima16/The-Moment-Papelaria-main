@@ -303,6 +303,38 @@ async function webhook(request, env) {
   return new Response('ok', { status: 200 });
 }
 
+// ------------------------------------------------------- consultar status
+// Pergunta ao Mercado Pago a situação de até 50 pedidos (pelo id do pedido no site).
+// Devolve só o status (sem dados pessoais).
+async function consultarStatus(request, env) {
+  if (!env.MP_ACCESS_TOKEN) throw new HttpError(500, 'Falta o MP_ACCESS_TOKEN.');
+  const body = await request.json().catch(() => ({}));
+  const ids = Array.isArray(body.ids) ?
+    [...new Set(body.ids.map((x) => String(x).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64)).filter(Boolean))].slice(0, 50) : [];
+  const result = {};
+  await Promise.all(ids.map(async (id) => {
+    try {
+      const resp = await fetch(`${MP_API}/v1/payments/search?external_reference=${encodeURIComponent(id)}&sort=date_created&criteria=desc&limit=10`, {
+        headers: { Authorization: `Bearer ${env.MP_ACCESS_TOKEN}` },
+      });
+      const data = await resp.json();
+      if (!resp.ok) return;
+      const pays = data.results || [];
+      if (!pays.length) { result[id] = { status: null }; return; }
+      const pay = pays.find((p) => p.status === 'approved') || pays[0];
+      result[id] = {
+        status: STATUS_MAP[pay.status] || 'Aguardando Pagamento',
+        mpStatus: pay.status,
+        mpPaymentId: String(pay.id),
+        paymentType: pay.payment_type_id || '',
+        amount: Number(pay.transaction_amount) || 0,
+        approvedAt: pay.date_approved || null,
+      };
+    } catch (e) { console.warn('status', id, e.message); }
+  }));
+  return result;
+}
+
 // ----------------------------------------------------------------- roteamento
 export default {
   async fetch(request, env) {
@@ -311,6 +343,9 @@ export default {
     try {
       if (request.method === 'POST' && pathname === '/criar-pagamento') {
         return json(await criarPagamento(request, env), 200, request);
+      }
+      if (request.method === 'POST' && pathname === '/status') {
+        return json(await consultarStatus(request, env), 200, request);
       }
       if (request.method === 'POST' && pathname === '/webhook') {
         return await webhook(request, env);

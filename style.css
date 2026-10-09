@@ -1016,3 +1016,23 @@ footer li i { width: 18px; color: var(--plum-900); margin-right: 6px; }
 .status-badge.ok { background: #eafaf0; color: #1e6b3a; }
 .status-badge.wait { background: #fff8e6; color: #7a5a00; }
 .status-badge.bad { background: #fdecec; color: #b3261e; }
+
+/* ---------- Painel: pedidos ---------- */
+.admin-hint { color: var(--muted); font-size: 14px; }
+.admin-nav li button i { margin-right: 6px; }
+.orders-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 20px; }
+.orders-toolbar select { padding: 10px 14px; border: 1.5px solid var(--line); border-radius: 12px; font-family: var(--font-body); font-weight: 700; background: var(--white); }
+.orders-toolbar .btn { width: auto; padding: 10px 18px; }
+.orders-cards { display: grid; gap: 14px; }
+.order-admin-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+.oac-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 18px; background: var(--blush-100); }
+.oac-head small { color: var(--muted); margin-left: 6px; }
+.oac-total { font-weight: 800; color: var(--plum-900); }
+.oac-body { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 16px; padding: 14px 18px; font-size: 14px; }
+.oac-body small { color: var(--muted); font-weight: 700; }
+.oac-body ul { margin: 4px 0 0; padding-left: 18px; }
+.oac-body li span { color: var(--muted); }
+.oac-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 18px; border-top: 1px dashed var(--line); font-size: 14px; font-weight: 700; }
+.oac-foot select { margin-left: 6px; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 10px; font-family: var(--font-body); }
+#admin-login .auth-box form { display: grid; gap: 12px; }
+@media (max-width: 760px) { .oac-body { grid-template-columns: 1fr; } }

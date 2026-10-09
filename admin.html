@@ -11,16 +11,31 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
     <link rel="manifest" href="site.webmanifest">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <div class="admin-panel">
+    <div id="admin-login" class="auth-modal">
+        <div class="auth-box">
+            <h2>Painel Admin</h2>
+            <p class="auth-lead" id="admin-login-msg">Entre com a conta da loja.</p>
+            <form id="login-form" autocomplete="on">
+                <input type="email" id="login-email" placeholder="E-mail" required>
+                <input type="password" id="login-password" placeholder="Senha" required minlength="6">
+                <button type="submit" class="btn">Entrar</button>
+                <p id="login-error" class="error-message hidden" role="alert"></p>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel hidden" id="admin-panel">
         <nav class="admin-nav">
             <div class="admin-nav-header">
                 <img src="transparent-Photoroom.png" alt="Logo The Moment" />
                 <h3>Painel Admin</h3>
             </div>
             <ul>
+                <li><button id="show-orders-view-btn"><i class="fa-solid fa-receipt"></i> Pedidos</button></li>
                 <li><button id="show-add-view-btn" class="active">Adicionar Produto</button></li>
                 <li><button id="show-manage-view-btn">Gerenciar Produtos</button></li>
             </ul>
@@ -69,12 +84,27 @@
                 </form>
             </div>
 
+            <div id="orders-view" class="hidden">
+                <h1>Pedidos</h1>
+                <p class="admin-hint">A coluna <strong>Mercado Pago</strong> é consultada na hora, direto no Mercado Pago. Pedidos pagos pelo Mercado Pago são marcados como "Pago" automaticamente.</p>
+                <div class="orders-toolbar">
+                    <select id="orders-filter">
+                        <option value="todos">Todos os pedidos</option>
+                        <option value="pendentes" selected>Só os que precisam de atenção</option>
+                        <option value="pagos">Pagos (enviar arquivo)</option>
+                    </select>
+                    <button type="button" id="orders-refresh" class="btn btn-secondary"><i class="fas fa-rotate"></i> Atualizar</button>
+                </div>
+                <div id="orders-list-container"><p>Carregando pedidos...</p></div>
+            </div>
+
             <div id="manage-products-view" class="hidden">
                 <h1>Gerenciar Produtos</h1>
                 <div id="products-list-container"></div>
             </div>
         </main>
     </div>
+    <script type="module" src="firebase-auth.js"></script>
     <script type="module" src="admin.js"></script>
 </body>
 </html>

@@ -1,19 +1,12 @@
 // admin.js (VERSÃO FINAL CORRIGIDA)
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { auth, db } from './firebase-auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { collection, addDoc, getDocs, doc, deleteDoc, getDoc, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-const firebaseConfig = {
-    apiKey: "SUA_CHAVE_DE_API_CORRETA_AQUI",
-    authDomain: "the-moment-b3e02.firebaseapp.com",
-    projectId: "the-moment-b3e02",
-    storageBucket: "the-moment-b3e02.appspot.com",
-    messagingSenderId: "263728888202",
-    appId: "1:263728888202:web:50fb8ce5b910a80a1e3073",
-    measurementId: "G-4LP2H73973"
-};
-const app = initializeApp(firebaseConfig, "adminApp");
-const db = getFirestore(app);
+// 👇 E-mails que podem abrir o painel (adicione o da sua esposa aqui, se quiser)
+const ADMIN_EMAILS = ['rodrigoalveslima5533@gmail.com'];
+const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
 
 const addView = document.getElementById('add-product-view');
 const manageView = document.getElementById('manage-products-view');
@@ -167,4 +160,138 @@ async function handleDeleteClick(event) {
             alert('Ocorreu um erro ao excluir o produto.');
         }
     }
+}
+
+// ===================== LOGIN DO PAINEL =====================
+const loginBox = document.getElementById('admin-login');
+const panel = document.getElementById('admin-panel');
+const loginMsg = document.getElementById('admin-login-msg');
+let painelIniciado = false;
+
+onAuthStateChanged(auth, (user) => {
+    const autorizado = user && ADMIN_EMAILS.includes(String(user.email || '').toLowerCase());
+    if (autorizado) {
+        loginBox.classList.add('hidden');
+        panel.classList.remove('hidden');
+        if (!painelIniciado) { painelIniciado = true; showOrdersView(); }
+    } else {
+        panel.classList.add('hidden');
+        loginBox.classList.remove('hidden');
+        if (user) loginMsg.textContent = `A conta ${user.email} não tem acesso ao painel.`;
+    }
+});
+window.closeAuthModal = () => {}; // o login do painel não usa o modal do site
+
+// ===================== PEDIDOS =====================
+const ordersView = document.getElementById('orders-view');
+const showOrdersBtn = document.getElementById('show-orders-view-btn');
+const ordersContainer = document.getElementById('orders-list-container');
+const ordersFilter = document.getElementById('orders-filter');
+const STATUS_OPCOES = ['Aguardando Pagamento', 'Pago', 'Entregue', 'Pagamento recusado', 'Cancelado', 'Reembolsado'];
+const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const brl = (v) => `R$ ${Number(v || 0).toFixed(2).replace('.', ',')}`;
+const badgeClass = (st) => {
+    const s = String(st || '').toLowerCase();
+    if (s === 'pago' || s === 'entregue') return 'ok';
+    if (s.includes('recusado') || s.includes('cancelado') || s.includes('reembolsado')) return 'bad';
+    return 'wait';
+};
+const TIPO_PAGAMENTO = { credit_card: 'cartão de crédito', debit_card: 'cartão de débito', bank_transfer: 'Pix', account_money: 'saldo Mercado Pago' };
+let pedidosCache = [];
+
+function setActive(btn) {
+    [showOrdersBtn, showAddBtn, showManageBtn].forEach(b => b && b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function showOrdersView() {
+    ordersView.classList.remove('hidden');
+    addView.classList.add('hidden');
+    manageView.classList.add('hidden');
+    setActive(showOrdersBtn);
+    loadOrders();
+}
+showOrdersBtn.addEventListener('click', showOrdersView);
+showAddBtn.addEventListener('click', () => { ordersView.classList.add('hidden'); showOrdersBtn.classList.remove('active'); });
+showManageBtn.addEventListener('click', () => { ordersView.classList.add('hidden'); showOrdersBtn.classList.remove('active'); });
+document.getElementById('orders-refresh').addEventListener('click', loadOrders);
+ordersFilter.addEventListener('change', renderOrders);
+
+async function loadOrders() {
+    ordersContainer.innerHTML = '<p>Carregando pedidos...</p>';
+    try {
+        const snap = await getDocs(query(collection(db, 'pedidos'), orderBy('createdAt', 'desc'), limit(150)));
+        pedidosCache = snap.docs.map(d => ({ id: d.id, ...d.data(), mp: null }));
+        renderOrders();
+        // Consulta o Mercado Pago para os pedidos pagos por lá
+        const ids = pedidosCache.filter(p => p.paymentMethod === 'Mercado Pago').map(p => p.id).slice(0, 50);
+        if (!ids.length) return;
+        const resp = await fetch(`${PAYMENT_API_URL}/status`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids })
+        });
+        if (!resp.ok) return;
+        const result = await resp.json();
+        for (const p of pedidosCache) {
+            const info = result[p.id];
+            if (!info) continue;
+            p.mp = info;
+            // Marca como "Pago" automaticamente quando o Mercado Pago aprovou
+            if (info.status === 'Pago' && !['Pago', 'Entregue'].includes(p.status)) {
+                try { await updateDoc(doc(db, 'pedidos', p.id), { status: 'Pago', mpPaymentId: info.mpPaymentId }); p.status = 'Pago'; } catch (e) { console.warn(e); }
+            }
+        }
+        renderOrders();
+    } catch (error) {
+        console.error('Erro ao carregar pedidos:', error);
+        ordersContainer.innerHTML = error && error.code === 'permission-denied'
+            ? '<p>Sem permissão para ler os pedidos. É preciso liberar o acesso do administrador nas regras do Firestore.</p>'
+            : '<p>Erro ao carregar os pedidos. Clique em Atualizar para tentar de novo.</p>';
+    }
+}
+
+function renderOrders() {
+    const filtro = ordersFilter.value;
+    const lista = pedidosCache.filter(p => {
+        if (filtro === 'pagos') return p.status === 'Pago';
+        if (filtro === 'pendentes') return !['Entregue', 'Cancelado', 'Reembolsado', 'Pagamento recusado'].includes(p.status);
+        return true;
+    });
+    if (!lista.length) { ordersContainer.innerHTML = '<p>Nenhum pedido aqui. 🎉</p>'; return; }
+
+    ordersContainer.innerHTML = `<div class="orders-cards">${lista.map(p => {
+        const data = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '';
+        const itens = (p.items || []).map(i => `<li>${esc(i.title)} <span>${brl(i.price)}</span></li>`).join('');
+        const mp = p.paymentMethod === 'Mercado Pago'
+            ? (p.mp ? (p.mp.status ? `<span class="status-badge ${badgeClass(p.mp.status)}">${esc(p.mp.status)}</span>${p.mp.paymentType ? ` <small>${esc(TIPO_PAGAMENTO[p.mp.paymentType] || p.mp.paymentType)}</small>` : ''}` : '<small>sem pagamento ainda</small>') : '<small>consultando...</small>')
+            : '<small>Pix manual: confira no banco</small>';
+        const opcoes = STATUS_OPCOES.map(o => `<option${o === p.status ? ' selected' : ''}>${o}</option>`).join('');
+        const tel = '551120504970';
+        return `
+        <div class="order-admin-card">
+            <div class="oac-head">
+                <div><strong>${esc(p.orderId)}</strong> <small>${data}</small></div>
+                <div class="oac-total">${brl(p.total)}</div>
+            </div>
+            <div class="oac-body">
+                <div><small>Cliente</small><br>${esc(p.userName)}<br><a href="mailto:${esc(p.userEmail)}">${esc(p.userEmail)}</a></div>
+                <div><small>Itens</small><ul>${itens}</ul></div>
+                <div><small>Forma de pagamento</small><br>${esc(p.paymentMethod || 'Pix manual')}<br><small>Mercado Pago:</small> ${mp}</div>
+            </div>
+            <div class="oac-foot">
+                <label>Status: <select data-status-id="${p.id}">${opcoes}</select></label>
+                <span class="status-badge ${badgeClass(p.status)}">${esc(p.status)}</span>
+            </div>
+        </div>`;
+    }).join('')}</div>`;
+
+    ordersContainer.querySelectorAll('[data-status-id]').forEach(sel => sel.addEventListener('change', async () => {
+        const id = sel.dataset.statusId;
+        try {
+            await updateDoc(doc(db, 'pedidos', id), { status: sel.value });
+            const p = pedidosCache.find(x => x.id === id); if (p) p.status = sel.value;
+            renderOrders();
+        } catch (e) {
+            alert('Não foi possível mudar o status: ' + (e.message || e));
+        }
+    }));
 }
