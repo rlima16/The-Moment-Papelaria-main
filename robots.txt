@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /admin.html
-Disallow: /carrinho.html
-Disallow: /minha-conta.html
+Disallow: /admin
+Disallow: /carrinho
+Disallow: /minha-conta
 
 Sitemap: https://lojathemoment.shop/sitemap.xml

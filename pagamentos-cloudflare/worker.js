@@ -205,9 +205,9 @@ async function criarPagamento(request, env) {
     payer: { name: nome, email, identification: { type: 'CPF', number: cpf } },
     external_reference: orderDocId,
     back_urls: {
-      success: `${SITE_URL}/minha-conta.html?pagamento=aprovado`,
-      pending: `${SITE_URL}/minha-conta.html?pagamento=pendente`,
-      failure: `${SITE_URL}/carrinho.html?pagamento=falhou`,
+      success: `${SITE_URL}/minha-conta?pagamento=aprovado`,
+      pending: `${SITE_URL}/minha-conta?pagamento=pendente`,
+      failure: `${SITE_URL}/carrinho?pagamento=falhou`,
     },
     auto_return: 'approved',
     statement_descriptor: 'THEMOMENT',

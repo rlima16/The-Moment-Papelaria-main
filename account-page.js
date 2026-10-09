@@ -44,7 +44,7 @@ auth.onAuthStateChanged(user => {
     } else {
         // Se o usuário não está logado, redireciona para a página inicial
         console.log("Usuário não logado. Redirecionando...");
-        window.location.href = 'index.html';
+        window.location.href = '/';
     }
 });
 

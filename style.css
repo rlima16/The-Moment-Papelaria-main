@@ -1036,3 +1036,17 @@ footer li i { width: 18px; color: var(--plum-900); margin-right: 6px; }
 .oac-foot select { margin-left: 6px; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 10px; font-family: var(--font-body); }
 #admin-login .auth-box form { display: grid; gap: 12px; }
 @media (max-width: 760px) { .oac-body { grid-template-columns: 1fr; } }
+
+/* ---------- Logo maior, encostado na linha rosa de baixo do cabeçalho (computador) ---------- */
+@media (min-width: 761px) {
+    .header-inner { grid-template-columns: 190px 1fr auto; }
+    .header-search { grid-column: 2; }
+    .header-user-actions { grid-column: 3; }
+    .header-logo {
+        position: absolute;
+        left: max(20px, calc((100% - var(--container)) / 2 + 20px));
+        bottom: 4px;
+        z-index: 2;
+    }
+    .header-logo img { height: 92px; width: auto; }
+}

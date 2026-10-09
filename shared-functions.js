@@ -1,5 +1,11 @@
 // shared-functions.js — funções usadas em todas as páginas
 
+// Endereços limpos: se alguém abrir /pagina.html, mostra só /pagina na barra de endereço
+if (/\.html$/.test(window.location.pathname)) {
+    const limpo = window.location.pathname.replace(/index\.html$/, '').replace(/\.html$/, '');
+    history.replaceState(null, '', limpo + window.location.search + window.location.hash);
+}
+
 let cart = [];
 try { cart = JSON.parse(sessionStorage.getItem('shoppingCart')) || []; } catch (e) { cart = []; }
 
@@ -54,7 +60,7 @@ export function showToast(message, withCartLink = false) {
     toast.appendChild(span);
     if (withCartLink) {
         const link = document.createElement('a');
-        link.href = 'carrinho.html';
+        link.href = '/carrinho';
         link.textContent = 'Ver carrinho →';
         toast.appendChild(link);
     }
@@ -125,7 +131,7 @@ export function createProductCard(product) {
     card.className = 'card';
     const inCart = isInCart(product.id);
     card.innerHTML = `
-        <a href="produto-detalhe.html?id=${encodeURIComponent(product.id)}" class="card-link">
+        <a href="/produto-detalhe?id=${encodeURIComponent(product.id)}" class="card-link">
             <div class="card-media">
                 <span class="digital-badge"><i class="fas fa-file-arrow-down"></i> Digital</span>
                 <img src="${product.image}" alt="" loading="lazy" decoding="async">
@@ -142,7 +148,7 @@ export function createProductCard(product) {
     card.querySelector('h3').textContent = product.title;
     card.querySelector('img').alt = product.title;
     card.querySelector('.add-to-cart-btn').addEventListener('click', (event) => {
-        if (isInCart(product.id)) { window.location.href = 'carrinho.html'; return; }
+        if (isInCart(product.id)) { window.location.href = '/carrinho'; return; }
         window.addToCart(event, product);
     });
     return card;
@@ -176,7 +182,7 @@ function setupSearch() {
     if (!searchInput || !searchButton) return;
     const performSearch = () => {
         const q = searchInput.value.trim();
-        if (q) window.location.href = `produtos.html?search=${encodeURIComponent(q)}`;
+        if (q) window.location.href = `/produtos?search=${encodeURIComponent(q)}`;
     };
     searchButton.addEventListener('click', performSearch);
     searchInput.addEventListener('keydown', (event) => { if (event.key === 'Enter') performSearch(); });

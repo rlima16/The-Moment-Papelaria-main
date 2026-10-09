@@ -79,7 +79,7 @@ function render() {
                 <p>Não encontramos nenhum produto${searchQuery ? ` para "<strong></strong>"` : ''}.</p>
                 <p>Não achou o tema que queria? Fale com a gente — podemos ter o arquivo ou criar um novo!</p>
                 <a class="btn" href="https://wa.me/551120504970" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i> Pedir pelo WhatsApp</a>
-                ${searchQuery ? '<a class="btn btn-secondary" href="produtos.html">Ver todos os produtos</a>' : ''}
+                ${searchQuery ? '<a class="btn btn-secondary" href="/produtos">Ver todos os produtos</a>' : ''}
             </div>`;
         const strong = productsList.querySelector('strong');
         if (strong) strong.textContent = searchQuery; // evita injetar HTML do que foi digitado
@@ -115,7 +115,7 @@ function createCategoryFilters() {
             selectedCategory = category;
             searchQuery = '';
             currentPage = 0;
-            history.replaceState(null, '', 'produtos.html' + (category ? `?categoria=${encodeURIComponent(category)}` : ''));
+            history.replaceState(null, '', '/produtos' + (category ? `?categoria=${encodeURIComponent(category)}` : ''));
             filtersContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
             button.classList.add('active');
             render();

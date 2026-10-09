@@ -60,7 +60,7 @@ function renderCartView() {
                 <i class="fa-solid fa-bag-shopping"></i>
                 <h2>Seu carrinho está vazinho</h2>
                 <p>Que tal escolher o tema da próxima festa?</p>
-                <a href="produtos.html" class="btn btn-lg">Ver arquivos <i class="fas fa-arrow-right"></i></a>
+                <a href="/produtos" class="btn btn-lg">Ver arquivos <i class="fas fa-arrow-right"></i></a>
             </div>`;
         updateCartHeaderInfo();
         return;
@@ -84,7 +84,7 @@ function renderCartView() {
             <div class="panel">
                 <h2>Seus arquivos (${cart.length})</h2>
                 ${itemsHtml}
-                <a href="produtos.html" class="link-continuar-comprando"><i class="fas fa-arrow-left"></i> Continuar comprando</a>
+                <a href="/produtos" class="link-continuar-comprando"><i class="fas fa-arrow-left"></i> Continuar comprando</a>
             </div>
 
             <div class="panel" id="checkout-container">
@@ -108,7 +108,7 @@ function renderCartView() {
                     <div class="form-group"><label for="nome">Nome completo</label><input type="text" id="nome" name="nome" autocomplete="name" required></div>
                     <div class="form-group"><label for="email">E-mail para contato</label><input type="email" id="email" name="email" autocomplete="email" value="${escapeHtml(auth.currentUser?.email || '')}" required></div>
                     <div class="form-group"><label for="cpf">CPF</label><input type="text" id="cpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required></div>
-                    <p class="form-privacy-note">Seus dados são usados apenas para identificar o pedido. Veja nossa <a href="ajuda.html#privacidade">política de privacidade</a>.</p>
+                    <p class="form-privacy-note">Seus dados são usados apenas para identificar o pedido. Veja nossa <a href="/ajuda#privacidade">política de privacidade</a>.</p>
 
                     <div class="form-group">
                         <label>Forma de pagamento</label>
@@ -176,11 +176,11 @@ function renderPixPaymentView() {
                     <li>Clique no botão abaixo e envie o <strong>comprovante</strong> pelo WhatsApp.</li>
                     <li>Assim que confirmarmos o pagamento, enviamos seu arquivo. Atendimento de segunda a sexta, das 9h às 18h.</li>
                 </ol>
-                <p>Acompanhe o status em <a href="minha-conta.html">Minha conta</a>.</p>
+                <p>Acompanhe o status em <a href="/minha-conta">Minha conta</a>.</p>
             </div>
 
             <button type="button" class="btn btn-lg btn-whatsapp" onclick="sendOrderToWhatsapp()"><i class="fab fa-whatsapp"></i> Enviar comprovante pelo WhatsApp</button>
-            <a href="index.html" class="btn btn-lg btn-outline">Voltar à loja</a>
+            <a href="/" class="btn btn-lg btn-outline">Voltar à loja</a>
         </div>
     `;
     window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -52,13 +52,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const productId = new URLSearchParams(window.location.search).get('id');
         if (!productId) {
-            loadingMessage.innerHTML = 'Produto não encontrado. <a href="produtos.html">Ver todos os produtos</a>';
+            loadingMessage.innerHTML = 'Produto não encontrado. <a href="/produtos">Ver todos os produtos</a>';
             return;
         }
 
         const docSnap = await getDoc(doc(db, "products", productId));
         if (!docSnap.exists()) {
-            loadingMessage.innerHTML = 'Produto não encontrado. <a href="produtos.html">Ver todos os produtos</a>';
+            loadingMessage.innerHTML = 'Produto não encontrado. <a href="/produtos">Ver todos os produtos</a>';
             return;
         }
 
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const link = document.getElementById('product-category-link');
             chip.textContent = categoryLabel(product.category);
             link.textContent = categoryLabel(product.category);
-            link.href = `produtos.html?categoria=${encodeURIComponent(product.category)}`;
+            link.href = `/produtos?categoria=${encodeURIComponent(product.category)}`;
         }
 
         const wa = document.getElementById('whatsapp-question');
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const setInCart = () => { addBtn.innerHTML = '<i class="fas fa-check"></i> No carrinho — finalizar compra'; };
         if (isInCart(product.id)) setInCart();
         addBtn.addEventListener('click', (event) => {
-            if (isInCart(product.id)) { window.location.href = 'carrinho.html'; return; }
+            if (isInCart(product.id)) { window.location.href = '/carrinho'; return; }
             window.addToCart(event, product);
             setInCart();
         });
