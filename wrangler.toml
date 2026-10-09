@@ -5,6 +5,9 @@ main = "pagamentos-cloudflare/worker.js"
 compatibility_date = "2026-09-01"
 workers_dev = true
 preview_urls = false
+# Mantém as variáveis/segredos cadastrados no painel do Cloudflare a cada publicação.
+# NUNCA coloque o token do Mercado Pago aqui (este arquivo é público no GitHub).
+keep_vars = true
 
 [observability]
 enabled = true
