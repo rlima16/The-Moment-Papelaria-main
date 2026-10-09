@@ -23,6 +23,7 @@ function showAddView() {
     formTitle.textContent = "Adicionar Novo Topo de Bolo";
     formButton.textContent = "Adicionar Produto";
     addProductForm.reset();
+    resetFileFields(null);
     addView.classList.remove('hidden');
     manageView.classList.add('hidden');
     showAddBtn.classList.add('active');
@@ -55,29 +56,73 @@ addProductForm.addEventListener('submit', async (event) => {
         featured: isFeatured, category: category, keywords: keywords,
         description: description
     };
+    const arquivo = document.getElementById('product-file').files[0];
+    const previa = document.getElementById('product-preview').files[0];
+    formButton.disabled = true;
+    formButton.textContent = 'Salvando...';
     try {
-        if (currentlyEditingId) {
-            const productRef = doc(db, "products", currentlyEditingId);
-            await updateDoc(productRef, productData);
-            alert(`Produto "${name}" atualizado com sucesso!`);
+        let productId = currentlyEditingId;
+        if (productId) {
+            await updateDoc(doc(db, "products", productId), productData);
         } else {
-            await addDoc(collection(db, "products"), productData);
-            alert(`Produto "${name}" adicionado com sucesso!`);
+            const ref = await addDoc(collection(db, "products"), productData);
+            productId = ref.id;
         }
+        if (arquivo) {
+            formButton.textContent = 'Enviando arquivo...';
+            await enviarArquivoProduto(productId, arquivo, 'arquivo');
+            await updateDoc(doc(db, "products", productId), { hasFile: true, fileName: arquivo.name });
+        }
+        if (previa) {
+            formButton.textContent = 'Enviando prévia...';
+            await enviarArquivoProduto(productId, previa, 'previa');
+            await updateDoc(doc(db, "products", productId), { previewName: previa.name });
+        }
+        alert(`Produto "${name}" salvo com sucesso!${arquivo ? ' Arquivo enviado ✔' : ''}`);
         showManageView();
     } catch (error) {
         console.error("Erro ao salvar produto: ", error);
-        alert("Ocorreu um erro ao salvar o produto.");
+        alert("Ocorreu um erro ao salvar: " + (error.message || error));
+    } finally {
+        formButton.disabled = false;
+        formButton.textContent = currentlyEditingId ? "Salvar Alterações" : "Adicionar Produto";
     }
 });
+
+// Envia o arquivo do topo (ou a prévia) para o servidor de arquivos (Cloudflare)
+async function enviarArquivoProduto(productId, file, tipo) {
+    if (file.size > 25 * 1024 * 1024) throw new Error(`"${file.name}" tem mais de 25 MB.`);
+    const token = await auth.currentUser.getIdToken();
+    const resp = await fetch(`${PAYMENT_API_URL}/admin/arquivo?produto=${encodeURIComponent(productId)}&tipo=${tipo}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': file.type || 'application/octet-stream',
+            'X-Nome-Arquivo': encodeURIComponent(file.name)
+        },
+        body: file
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.error || `Falha ao enviar ${file.name}`);
+    return data;
+}
+
+function resetFileFields(product) {
+    document.getElementById('product-file').value = '';
+    document.getElementById('product-preview').value = '';
+    document.getElementById('product-file-status').textContent = product && product.fileName
+        ? `Arquivo atual: ${product.fileName} (escolha outro para substituir)` : 'Nenhum arquivo enviado ainda.';
+    document.getElementById('product-preview-status').textContent = product && product.previewName
+        ? `Prévia atual: ${product.previewName}` : 'Sem prévia: o cliente vê a foto do produto.';
+}
 
 async function loadProductsForManagement() {
     productsListContainer.innerHTML = '<p>Carregando produtos...</p>';
     try {
         const querySnapshot = await getDocs(collection(db, "products"));
-        let tableHtml = `<table class="product-manage-list"><tr><th>Imagem</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Ações</th></tr>`;
+        let tableHtml = `<table class="product-manage-list"><tr><th>Imagem</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Arquivo</th><th>Ações</th></tr>`;
         if (querySnapshot.empty) {
-            tableHtml += '<tr><td colspan="5">Nenhum produto cadastrado.</td></tr>';
+            tableHtml += '<tr><td colspan="6">Nenhum produto cadastrado.</td></tr>';
         } else {
             querySnapshot.forEach((doc) => {
                 const product = doc.data();
@@ -87,6 +132,7 @@ async function loadProductsForManagement() {
                         <td>${product.title}</td>
                         <td>${product.category || 'N/A'}</td>
                         <td>R$ ${Number(product.price).toFixed(2)}</td>
+                        <td>${product.hasFile ? '<span class="status-badge ok">✔ enviado</span>' : '<span class="status-badge wait">falta</span>'}</td>
                         <td class="product-actions">
                             <button class="btn-edit" data-id="${doc.id}">Editar</button>
                             <button class="btn-delete" data-id="${doc.id}">Excluir</button>
@@ -125,6 +171,7 @@ async function handleEditClick(event) {
             document.getElementById('product-featured').checked = product.featured || false;
             const descriptionField = document.getElementById('product-description');
             if (descriptionField) descriptionField.value = product.description || '';
+            resetFileFields(product);
             
             // Troca a visibilidade das telas
             addView.classList.remove('hidden');

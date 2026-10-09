@@ -7,7 +7,7 @@ const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.
 
 async function criarPagamento(dados) {
     if (PAYMENT_API_URL.includes('COLE-AQUI')) {
-        throw new Error('Pagamento com cartão ainda não configurado. Escolha "Pix pela chave".');
+        throw new Error('Pagamento indisponível no momento. Tente novamente em instantes.');
     }
     const resp = await fetch(`${PAYMENT_API_URL}/criar-pagamento`, {
         method: 'POST',
@@ -95,7 +95,7 @@ function renderCartView() {
 
                 <div class="digital-info-banner" style="margin:18px 0">
                     <i class="fas fa-circle-info"></i>
-                    <p>Você está comprando <strong>arquivos digitais (.studio3)</strong>. Nenhum item físico será enviado.</p>
+                    <p>Você está comprando <strong>arquivos digitais (.studio3)</strong>. Assim que o pagamento for aprovado, eles ficam disponíveis para <strong>baixar na sua área do cliente</strong>.</p>
                 </div>
 
                 ${loggedIn ? '' : `
@@ -117,14 +117,7 @@ function renderCartView() {
                                 <input type="radio" name="pagamento" value="mercadopago" checked>
                                 <span class="po-body">
                                     <strong><i class="fa-regular fa-credit-card"></i> Cartão de crédito, débito ou Pix</strong>
-                                    <small>Pagamento seguro pelo Mercado Pago · confirmação automática</small>
-                                </span>
-                            </label>
-                            <label class="payment-option">
-                                <input type="radio" name="pagamento" value="pix-manual">
-                                <span class="po-body">
-                                    <strong><i class="fa-brands fa-pix"></i> Pix pela chave (manual)</strong>
-                                    <small>Você paga e envia o comprovante pelo WhatsApp</small>
+                                    <small>Pagamento seguro pelo Mercado Pago · o topo é liberado na hora na sua área do cliente</small>
                                 </span>
                             </label>
                         </div>

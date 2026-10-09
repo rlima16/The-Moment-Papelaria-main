@@ -11,3 +11,8 @@ keep_vars = true
 
 [observability]
 enabled = true
+
+# Arquivos dos topos (.studio3) que os clientes baixam depois de pagar.
+# Sem "id": o Cloudflare cria o espaço de armazenamento automaticamente na publicação.
+[[kv_namespaces]]
+binding = "ARQUIVOS"

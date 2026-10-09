@@ -16,6 +16,9 @@
 const PROJECT_ID = 'the-moment-b3e02';
 const FIREBASE_API_KEY = 'AIzaSyBhiNkiR7D_xI_W_2L2bLUG3gC1--HUn18'; // chave pública do site
 const SITE_URL = 'https://lojathemoment.shop';
+// E-mails que podem enviar arquivos pelo painel admin (mesma lista do admin.js)
+const ADMIN_EMAILS = ['rodrigoalveslima5533@gmail.com'];
+const MAX_ARQUIVO = 25 * 1024 * 1024; // limite do KV do Cloudflare
 const ALLOWED_ORIGINS = [
   SITE_URL, 'https://www.lojathemoment.shop',
   'http://lojathemoment.shop', 'http://www.lojathemoment.shop', // enquanto o HTTPS não estiver forçado
@@ -46,8 +49,9 @@ const corsHeaders = (request) => {
   const origin = request.headers.get('Origin') || '';
   return {
     'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : SITE_URL,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Nome-Arquivo',
+    'Access-Control-Expose-Headers': 'Content-Disposition, X-Nome-Arquivo',
     'Vary': 'Origin',
   };
 };
@@ -335,6 +339,113 @@ async function consultarStatus(request, env) {
   return result;
 }
 
+// ------------------------------------------------------ arquivos dos topos
+// Os arquivos ficam no Cloudflare KV (binding ARQUIVOS):
+//   arquivo:<idProduto>  -> o .studio3 (download)
+//   previa:<idProduto>   -> imagem ou PDF para visualizar no navegador (opcional)
+
+async function verifyUser(request) {
+  const auth = request.headers.get('Authorization') || '';
+  const idToken = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!idToken) throw new HttpError(401, 'Entre na sua conta para acessar seus arquivos.');
+  const resp = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken }),
+  });
+  const data = await resp.json().catch(() => ({}));
+  const user = data.users && data.users[0];
+  if (!resp.ok || !user) throw new HttpError(401, 'Sua sessão expirou. Entre na conta novamente.');
+  return { uid: user.localId, email: String(user.email || '').toLowerCase(), idToken };
+}
+const isAdmin = (user) => ADMIN_EMAILS.includes(user.email);
+
+const cleanId = (v) => String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
+
+function kv(env) {
+  if (!env.ARQUIVOS) throw new HttpError(500, 'Armazenamento de arquivos não configurado (KV "ARQUIVOS").');
+  return env.ARQUIVOS;
+}
+
+// Painel admin envia o arquivo de um produto
+async function enviarArquivo(request, env, url) {
+  const user = await verifyUser(request);
+  if (!isAdmin(user)) throw new HttpError(403, 'Apenas administradores podem enviar arquivos.');
+  const produto = cleanId(url.searchParams.get('produto'));
+  const tipo = url.searchParams.get('tipo') === 'previa' ? 'previa' : 'arquivo';
+  if (!produto) throw new HttpError(400, 'Produto não informado.');
+  const nome = decodeURIComponent(request.headers.get('X-Nome-Arquivo') || '') || `${produto}.studio3`;
+  const body = await request.arrayBuffer();
+  if (!body.byteLength) throw new HttpError(400, 'Arquivo vazio.');
+  if (body.byteLength > MAX_ARQUIVO) throw new HttpError(413, 'Arquivo maior que 25 MB.');
+  const type = request.headers.get('Content-Type') || 'application/octet-stream';
+  await kv(env).put(`${tipo}:${produto}`, body, {
+    metadata: { name: nome.slice(0, 200), type, size: body.byteLength, enviadoEm: new Date().toISOString() },
+  });
+  return { ok: true, nome, tamanho: body.byteLength };
+}
+
+// Confere no Mercado Pago se o pedido foi pago e se inclui o produto
+async function pedidoPagoInclui(env, pedidoId, produto, order) {
+  const resp = await fetch(`${MP_API}/v1/payments/search?external_reference=${encodeURIComponent(pedidoId)}&sort=date_created&criteria=desc&limit=10`, {
+    headers: { Authorization: `Bearer ${env.MP_ACCESS_TOKEN}` },
+  });
+  const data = await resp.json().catch(() => ({}));
+  const pagos = (data.results || []).filter((p) => p.status === 'approved');
+  if (!pagos.length) return false;
+  for (const pay of pagos) {
+    const itens = (pay.additional_info && pay.additional_info.items) || [];
+    if (itens.length) {
+      if (itens.some((i) => String(i.id) === produto)) return true;
+    } else {
+      // sem a lista de itens no pagamento: confere pelo pedido e pelo valor
+      const total = Number(order.total) || 0;
+      const temItem = (order.items || []).some((i) => i && String(i.id) === produto);
+      if (temItem && Number(pay.transaction_amount) + 0.01 >= total) return true;
+    }
+  }
+  return false;
+}
+
+// Cliente baixa (modo=baixar) ou visualiza (modo=ver) um arquivo comprado
+async function entregarArquivo(request, env, url) {
+  const user = await verifyUser(request);
+  const produto = cleanId(url.searchParams.get('produto'));
+  const pedidoId = cleanId(url.searchParams.get('pedido'));
+  const modo = url.searchParams.get('modo') === 'ver' ? 'ver' : 'baixar';
+  if (!produto) throw new HttpError(400, 'Produto não informado.');
+
+  if (!isAdmin(user)) {
+    if (!pedidoId) throw new HttpError(400, 'Pedido não informado.');
+    // Lê o pedido com o login do próprio cliente (respeita as regras do Firestore)
+    const r = await fetch(`${FS_BASE}/pedidos/${pedidoId}`, { headers: { Authorization: `Bearer ${user.idToken}` } });
+    if (!r.ok) throw new HttpError(403, 'Pedido não encontrado na sua conta.');
+    const d = await r.json();
+    const order = fromFields(d.fields);
+    if (order.userId !== user.uid) throw new HttpError(403, 'Este pedido não é da sua conta.');
+    if (!(await pedidoPagoInclui(env, pedidoId, produto, order))) {
+      throw new HttpError(402, 'O pagamento deste pedido ainda não foi confirmado.');
+    }
+  }
+
+  const chave = `${modo === 'ver' ? 'previa' : 'arquivo'}:${produto}`;
+  const { value, metadata } = await kv(env).getWithMetadata(chave, { type: 'stream' });
+  if (!value) {
+    throw new HttpError(404, modo === 'ver' ? 'sem-previa' : 'O arquivo deste topo ainda está sendo preparado. Avisaremos você!');
+  }
+  const meta = metadata || {};
+  const nome = meta.name || `${produto}.studio3`;
+  return new Response(value, {
+    headers: {
+      ...corsHeaders(request),
+      'Content-Type': meta.type || 'application/octet-stream',
+      'Content-Disposition': `${modo === 'ver' ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(nome)}`,
+      'X-Nome-Arquivo': encodeURIComponent(nome),
+      'Cache-Control': 'private, no-store',
+    },
+  });
+}
+
 // ----------------------------------------------------------------- roteamento
 export default {
   async fetch(request, env) {
@@ -343,6 +454,13 @@ export default {
     try {
       if (request.method === 'POST' && pathname === '/criar-pagamento') {
         return json(await criarPagamento(request, env), 200, request);
+      }
+      const url = new URL(request.url);
+      if (request.method === 'POST' && pathname === '/admin/arquivo') {
+        return json(await enviarArquivo(request, env, url), 200, request);
+      }
+      if (request.method === 'GET' && pathname === '/arquivo') {
+        return await entregarArquivo(request, env, url);
       }
       if (request.method === 'POST' && pathname === '/status') {
         return json(await consultarStatus(request, env), 200, request);

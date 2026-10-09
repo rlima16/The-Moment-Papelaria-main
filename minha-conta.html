@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#febecf">
-    <title>Minha Conta - The Moment</title>
+    <title>Meus Topos - Área do Cliente - The Moment</title>
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
@@ -19,7 +19,7 @@
 <body>
 
 <div class="announcement-bar">
-    <span><i class="fas fa-scissors"></i>Arquivos .studio3 para Silhouette</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fa-regular fa-credit-card"></i>Cartão, débito ou Pix</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fab fa-whatsapp"></i>Atendimento pelo WhatsApp</span>
+    <span><i class="fas fa-scissors"></i>Arquivos .studio3 para Silhouette</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fa-regular fa-credit-card"></i>Cartão, débito ou Pix</span><span class="sep hide-sm">•</span><span class="hide-sm"><i class="fa-solid fa-download"></i>Download na hora, na sua área do cliente</span>
 </div>
 
 <header class="main-header">
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div id="user-dropdown" class="dropdown-content hidden">
-                <a href="/minha-conta"><i class="fa-solid fa-receipt"></i> Meus pedidos</a>
+                <a href="/minha-conta"><i class="fa-solid fa-download"></i> Meus topos</a>
                 <a href="#" id="logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
             </div>
             <a class="action-item" href="/carrinho" id="cart-link-header" aria-label="Carrinho">
@@ -68,14 +68,29 @@
 
 <main>
     <section class="page-hero">
-        <div class="breadcrumb"><a href="/">Início</a><span class="sep">/</span><span>Minha conta</span></div>
-        <h1>Minha conta</h1>
+        <div class="breadcrumb"><a href="/">Início</a><span class="sep">/</span><span>Área do cliente</span></div>
+        <h1>Meus topos</h1>
         <p id="welcome-message">Carregando informações...</p>
     </section>
     <div class="container account-page-container">
-        <h2>Meus pedidos</h2>
-        <div id="order-history-container"></div>
-        <p id="no-orders-message" class="hidden">Você ainda não fez nenhum pedido. <a href="/produtos">Que tal escolher o primeiro tema?</a></p>
+        <section class="my-files">
+            <div class="my-files-head">
+                <h2><i class="fa-solid fa-cloud-arrow-down"></i> Arquivos comprados</h2>
+                <p>Assim que o pagamento é aprovado, seus topos aparecem aqui para <strong>baixar</strong> (.studio3) e <strong>visualizar</strong>. Eles ficam guardados na sua conta para baixar quantas vezes quiser.</p>
+            </div>
+            <div id="my-files-grid" class="files-grid"></div>
+            <div id="no-files-message" class="empty-files hidden">
+                <i class="fa-regular fa-folder-open"></i>
+                <p>Você ainda não tem topos comprados.</p>
+                <a href="/produtos" class="btn">Escolher meu primeiro topo</a>
+            </div>
+        </section>
+
+        <section class="my-orders">
+            <h2><i class="fa-solid fa-receipt"></i> Histórico de pedidos</h2>
+            <div id="order-history-container"></div>
+            <p id="no-orders-message" class="hidden">Você ainda não fez nenhum pedido.</p>
+        </section>
     </div>
 </main>
 
@@ -107,7 +122,7 @@
                 <li><a href="/ajuda">Dúvidas frequentes</a></li>
                 <li><a href="/ajuda#trocas">Trocas e reembolso</a></li>
                 <li><a href="/ajuda#privacidade">Privacidade</a></li>
-                <li><a href="/minha-conta">Meus pedidos</a></li>
+                <li><a href="/minha-conta">Meus topos (área do cliente)</a></li>
             </ul>
         </div>
         <div>
