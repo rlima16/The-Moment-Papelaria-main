@@ -337,8 +337,8 @@ async function criarPix(request, env) {
     description: items.length === 1 ? items[0].title.slice(0, 200) : `${items.length} arquivos digitais - The Moment`,
     payment_method_id: 'pix',
     external_reference: orderDocId,
-    date_of_expiration: expira.toISOString().replace('Z', '+00:00'),
-    statement_descriptor: 'THEMOMENT',
+    // formato aceito pelo Mercado Pago: 2026-10-10T13:32:00.000-03:00 (horário de Brasília)
+    date_of_expiration: new Date(expira.getTime() - 3 * 3600 * 1000).toISOString().replace('Z', '-03:00'),
     payer: {
       email,
       first_name: partes[0],
@@ -365,7 +365,8 @@ async function criarPix(request, env) {
   const tx = pay.point_of_interaction && pay.point_of_interaction.transaction_data;
   if (!resp.ok || !tx || !tx.qr_code) {
     console.error('Erro ao criar Pix', resp.status, JSON.stringify(pay));
-    throw new HttpError(502, 'Não foi possível gerar o Pix agora. Tente novamente.');
+    const motivo = [pay.message, ...((pay.cause || []).map((c) => c.description || c.code))].filter(Boolean).join(' | ');
+    throw new HttpError(502, `Não foi possível gerar o Pix agora. (Mercado Pago: ${motivo || resp.status})`);
   }
   return {
     paymentId: String(pay.id),
