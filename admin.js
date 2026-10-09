@@ -1,6 +1,6 @@
 // admin.js (VERSÃO FINAL CORRIGIDA)
 
-import { auth, db } from './firebase-auth.js?v=20261012';
+import { auth, db } from './firebase-auth.js?v=20261013';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, getDoc, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
@@ -310,7 +310,7 @@ function renderOrders() {
         const data = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '';
         const itens = (p.items || []).map(i => `<li>${esc(i.title)} <span>${brl(i.price)}</span></li>`).join('');
         const mp = p.paymentMethod === 'Mercado Pago'
-            ? (p.mp ? (p.mp.status ? `<span class="status-badge ${badgeClass(p.mp.status)}">${esc(p.mp.status)}</span>${p.mp.paymentType ? ` <small>${esc(TIPO_PAGAMENTO[p.mp.paymentType] || p.mp.paymentType)}</small>` : ''}` : '<small>sem pagamento ainda</small>') : '<small>consultando...</small>')
+            ? (p.mp ? (p.mp.status ? `<span class="status-badge ${badgeClass(p.mp.status)}">${esc(p.mp.status)}</span>${p.mp.paymentType ? ` <small>${esc(TIPO_PAGAMENTO[p.mp.paymentType] || p.mp.paymentType)}</small>` : ''}${p.mp.statusDetail && p.mp.mpStatus === 'rejected' ? ` <small title="motivo da recusa">(${esc(p.mp.statusDetail)})</small>` : ''}` : '<small>sem pagamento ainda</small>') : '<small>consultando...</small>')
             : '<small>Pix manual: confira no banco</small>';
         const opcoes = STATUS_OPCOES.map(o => `<option${o === p.status ? ' selected' : ''}>${o}</option>`).join('');
         const tel = '551120504970';

@@ -1,8 +1,8 @@
 // script.js — página inicial
 
-import { db } from './firebase-auth.js?v=20261012';
+import { db } from './firebase-auth.js?v=20261013';
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-import { createProductCard } from './shared-functions.js?v=20261012';
+import { createProductCard } from './shared-functions.js?v=20261013';
 
 document.addEventListener('DOMContentLoaded', () => {
     displayFeaturedProducts();

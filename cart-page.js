@@ -1,6 +1,6 @@
 // cart-page.js ATUALIZADO NOVAMENTE
 
-import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261012';
+import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261013';
 
 // 👇 Endereço do servidor de pagamentos (Cloudflare Worker). Troque depois de publicar o Worker.
 const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
@@ -65,6 +65,26 @@ function loadCartFromSession() {
     renderCartView();
 }
 
+// Explica em português o motivo da recusa do cartão (status_detail do Mercado Pago)
+function motivoRecusa(detalhe) {
+    const motivos = {
+        cc_rejected_high_risk: 'O Mercado Pago recusou por segurança (prevenção a fraudes). Isso costuma acontecer com valores muito baixos ou dados diferentes do titular. Tente outro cartão ou pague com Pix.',
+        cc_rejected_insufficient_amount: 'O cartão não tem limite ou saldo suficiente.',
+        cc_rejected_bad_filled_security_code: 'O código de segurança (CVV) está incorreto.',
+        cc_rejected_bad_filled_date: 'A data de validade do cartão está incorreta.',
+        cc_rejected_bad_filled_card_number: 'O número do cartão está incorreto.',
+        cc_rejected_bad_filled_other: 'Algum dado do cartão está incorreto. Confira e tente de novo.',
+        cc_rejected_call_for_authorize: 'O banco pediu autorização. Ligue para o banco ou autorize a compra no app dele e tente de novo.',
+        cc_rejected_card_disabled: 'O cartão está bloqueado ou desativado. Ative no app do banco ou use outro cartão.',
+        cc_rejected_duplicated_payment: 'Já existe um pagamento igual feito agora há pouco. Confira em Meus topos.',
+        cc_rejected_max_attempts: 'Muitas tentativas com este cartão. Use outro cartão ou pague com Pix.',
+        cc_rejected_blacklist: 'Este cartão não pôde ser usado. Tente outro cartão ou pague com Pix.',
+        cc_rejected_card_type_not_allowed: 'Este tipo de cartão não é aceito. Tente outro cartão ou pague com Pix.',
+        cc_rejected_other_reason: 'O banco emissor recusou o pagamento. Tente outro cartão ou pague com Pix.'
+    };
+    return motivos[detalhe] || 'O cartão foi recusado. Você pode tentar de novo com outro cartão ou pagar com Pix.';
+}
+
 // Tela de retorno do cartão (igual à do Pix): aprovado na hora, ou aguardando e conferindo sozinho
 function renderRetornoCartao(retorno, docId) {
     const container = document.querySelector('.cart-page-container');
@@ -98,7 +118,8 @@ function renderRetornoCartao(retorno, docId) {
                     <div class="pix-step">
                         <div class="success-icon bad"><i class="fas fa-xmark"></i></div>
                         <h1>Pagamento não aprovado</h1>
-                        <p>O cartão foi recusado. Você pode tentar de novo com outro cartão ou pagar com Pix.</p>
+                        <p>${motivoRecusa(info.statusDetail)}</p>
+                        <p><small>Dica: o <strong>Pix</strong> é aprovado na hora e libera seu topo em segundos.</small></p>
                         <a href="/carrinho" class="btn btn-lg">Tentar novamente</a>
                         <a href="/" class="btn btn-lg btn-outline">Voltar para o site</a>
                     </div>`;

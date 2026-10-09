@@ -1,6 +1,6 @@
-import { db } from './firebase-auth.js?v=20261012';
+import { db } from './firebase-auth.js?v=20261013';
 import { doc, getDoc, collection, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-import { createProductCard, formatPrice, categoryLabel, categoryGroup, isInCart } from './shared-functions.js?v=20261012';
+import { createProductCard, formatPrice, categoryLabel, categoryGroup, isInCart } from './shared-functions.js?v=20261013';
 
 /**
  * Produtos relacionados: prioriza a mesma categoria e completa com outros.

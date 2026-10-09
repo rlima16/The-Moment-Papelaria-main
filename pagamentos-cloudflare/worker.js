@@ -206,7 +206,8 @@ async function criarPagamento(request, env) {
       currency_id: 'BRL',
       unit_price: i.price,
     })),
-    payer: { name: nome, email, identification: { type: 'CPF', number: cpf } },
+    payer: Object.assign({ name: nome.split(/\s+/)[0], surname: nome.split(/\s+/).slice(1).join(' '), email },
+      cpfValido(cpf) ? { identification: { type: 'CPF', number: cpf } } : {}),
     external_reference: orderDocId,
     back_urls: {
       success: `${SITE_URL}/carrinho?pagamento=aprovado`,
@@ -408,6 +409,7 @@ async function consultarStatus(request, env) {
       result[id] = {
         status: STATUS_MAP[pay.status] || 'Aguardando Pagamento',
         mpStatus: pay.status,
+        statusDetail: pay.status_detail || '',
         mpPaymentId: String(pay.id),
         paymentType: pay.payment_type_id || '',
         amount: Number(pay.transaction_amount) || 0,
