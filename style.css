@@ -1087,3 +1087,4 @@ footer li i { width: 18px; color: var(--plum-900); margin-right: 6px; }
 .pix-approved h1 { color: #1e6b3a; }
 .pix-approved p { color: var(--plum-700); margin-bottom: 20px; }
 .pix-approved .btn { margin: 6px; }
+.pix-payment-view .success-icon.bad { background: #fdecec; color: #b3261e; }

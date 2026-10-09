@@ -1,6 +1,6 @@
 // cart-page.js ATUALIZADO NOVAMENTE
 
-import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261010';
+import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261011';
 
 // 👇 Endereço do servidor de pagamentos (Cloudflare Worker). Troque depois de publicar o Worker.
 const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
@@ -55,7 +55,63 @@ function loadCartFromSession() {
     if (cartData) {
         try { cart = JSON.parse(cartData); } catch (e) { cart = []; }
     }
+    // Voltou do Mercado Pago depois de pagar com cartão: mostra a mesma tela do Pix
+    const params = new URLSearchParams(window.location.search);
+    const retorno = params.get('pagamento');
+    if (retorno === 'aprovado' || retorno === 'pendente') {
+        renderRetornoCartao(retorno, params.get('external_reference') || '');
+        return;
+    }
     renderCartView();
+}
+
+// Tela de retorno do cartão (igual à do Pix): aprovado na hora, ou aguardando e conferindo sozinho
+function renderRetornoCartao(retorno, docId) {
+    const container = document.querySelector('.cart-page-container');
+    if (!container) return;
+    lastOrderData = { docId };
+    const hero = document.querySelector('.page-hero');
+    if (hero) hero.classList.add('hidden');
+    container.innerHTML = `
+        <div class="panel pix-payment-view" id="pix-view">
+            <div class="pix-step">
+                <div class="success-icon"><i class="fa-regular fa-credit-card"></i></div>
+                <h1>Confirmando seu pagamento...</h1>
+                <p class="pix-checking"><i class="fas fa-spinner fa-spin"></i> Só um instante, estamos falando com o Mercado Pago.</p>
+                <a href="/" class="pix-back">Voltar para o site</a>
+            </div>
+        </div>`;
+    window.scrollTo({ top: 0 });
+
+    if (retorno === 'aprovado' && !docId) { pagamentoAprovado(); return; }
+    let tentativas = 0;
+    const conferir = async () => {
+        tentativas++;
+        try {
+            const result = await postApi('/status', { ids: [docId] });
+            const info = result[docId];
+            if (info && info.status === 'Pago') { clearInterval(pixTimer); pagamentoAprovado(); return; }
+            if (info && ['Cancelado', 'Pagamento recusado'].includes(info.status)) {
+                clearInterval(pixTimer);
+                const view = document.getElementById('pix-view');
+                if (view) view.innerHTML = `
+                    <div class="pix-step">
+                        <div class="success-icon bad"><i class="fas fa-xmark"></i></div>
+                        <h1>Pagamento não aprovado</h1>
+                        <p>O cartão foi recusado. Você pode tentar de novo com outro cartão ou pagar com Pix.</p>
+                        <a href="/carrinho" class="btn btn-lg">Tentar novamente</a>
+                        <a href="/" class="btn btn-lg btn-outline">Voltar para o site</a>
+                    </div>`;
+                return;
+            }
+        } catch (e) { /* tenta de novo */ }
+        if (retorno === 'aprovado' && tentativas >= 3) { clearInterval(pixTimer); pagamentoAprovado(); return; }
+        const msg = document.querySelector('#pix-view .pix-checking');
+        if (msg && tentativas >= 2) msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pagamento em análise pelo Mercado Pago. Esta tela muda sozinha quando for aprovado.';
+    };
+    conferir();
+    clearInterval(pixTimer);
+    pixTimer = setInterval(conferir, 4000);
 }
 
 const fmt = (v) => `R$ ${Number(v || 0).toFixed(2).replace('.', ',')}`;
