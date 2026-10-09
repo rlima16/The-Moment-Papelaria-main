@@ -12,6 +12,17 @@ let allProducts = [];
 let searchQuery = '';
 let currentSortOrder = 'title-asc';
 let selectedCategory = null;
+let selectedColecao = null;
+
+// Coleções especiais (usadas nos blocos da página inicial): juntam produtos por palavras do nome
+const COLECOES = {
+    'festa-adulto': {
+        titulo: 'Festa Adulto',
+        descricao: 'Topos divertidos para aniversários de adultos: hobbies, profissões, comidinhas e muito estilo.',
+        palavras: ['academia', 'sushi', 'gastadeira', 'preto e dourado', 'dourado', 'medico', 'medica', 'futebol', 'cerveja', 'boteco',
+                   'churrasco', 'vinho', 'aposentad', 'formatura', 'formando', 'enfermeir', 'advogad', 'dentista', 'pescaria', 'chef', 'cafe']
+    }
+};
 let currentPage = 0;
 
 const normalize = (text) => String(text || '')
@@ -31,6 +42,9 @@ function getFilteredProducts() {
             const haystack = p._search;
             return terms.every(term => haystack.includes(term));
         });
+    } else if (selectedColecao) {
+        const palavras = COLECOES[selectedColecao].palavras;
+        list = list.filter(p => { const t = normalize(p.title); return palavras.some(w => t.includes(w)); });
     } else if (selectedCategory) {
         list = list.filter(p => categoryGroup(p.category) === selectedCategory);
     }
@@ -62,6 +76,9 @@ function render() {
     if (searchQuery) {
         pageTitle.textContent = `Resultados para "${searchQuery}"`;
         if (subtitle) subtitle.textContent = 'Arquivos encontrados para a sua busca.';
+    } else if (selectedColecao) {
+        pageTitle.textContent = COLECOES[selectedColecao].titulo;
+        if (subtitle) subtitle.textContent = COLECOES[selectedColecao].descricao;
     } else if (selectedCategory) {
         pageTitle.textContent = `Arquivos de ${categoryLabel(selectedCategory)}`;
         if (subtitle) subtitle.textContent = `Topos de bolo com o tema ${categoryLabel(selectedCategory)}, prontos para cortar na sua Silhouette.`;
@@ -113,6 +130,7 @@ function createCategoryFilters() {
         if (category === selectedCategory && !searchQuery) button.classList.add('active');
         button.addEventListener('click', () => {
             selectedCategory = category;
+            selectedColecao = null;
             searchQuery = '';
             currentPage = 0;
             history.replaceState(null, '', '/produtos' + (category ? `?categoria=${encodeURIComponent(category)}` : ''));
@@ -131,6 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     searchQuery = (urlParams.get('search') || '').trim();
     selectedCategory = urlParams.get('categoria') ? categoryGroup(urlParams.get('categoria')) : null;
+    selectedColecao = COLECOES[urlParams.get('colecao')] ? urlParams.get('colecao') : null;
 
     const searchInput = document.querySelector('.header-search input');
     if (searchInput && searchQuery) searchInput.value = searchQuery;
