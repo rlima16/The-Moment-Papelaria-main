@@ -19,7 +19,7 @@ const db = admin.firestore();
 const REGION = "southamerica-east1";
 setGlobalOptions({region: REGION, maxInstances: 10});
 
-const SITE_URL = "https://themomentoficial.shop";
+const SITE_URL = "https://lojathemoment.shop";
 const PROJECT_ID = "the-moment-b3e02";
 const WEBHOOK_URL =
   `https://${REGION}-${PROJECT_ID}.cloudfunctions.net/webhookMercadoPago`;

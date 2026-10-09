@@ -4,4 +4,4 @@ Disallow: /admin.html
 Disallow: /carrinho.html
 Disallow: /minha-conta.html
 
-Sitemap: https://themomentoficial.shop/sitemap.xml
+Sitemap: https://lojathemoment.shop/sitemap.xml
