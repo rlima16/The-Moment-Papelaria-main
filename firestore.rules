@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// Regras de segurança do banco (Firestore) da The Moment.
+// Para aplicar: Console do Firebase > Firestore Database > Regras > colar este conteúdo > Publicar.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // E-mails com acesso ao painel admin (mesma lista do admin.js)
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['rodrigoalveslima5533@gmail.com'];
+    }
+    function isLogado() {
+      return request.auth != null;
+    }
+
+    // Produtos: qualquer pessoa vê; só o admin cria, edita ou exclui
+    match /products/{produto} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Pedidos: cada cliente vê só os próprios; o admin vê todos
+    match /pedidos/{pedido} {
+      allow read: if isAdmin()
+        || (isLogado() && resource.data.userId == request.auth.uid);
+
+      // o cliente só cria pedido no próprio nome e sempre como "Aguardando Pagamento"
+      allow create: if isLogado()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'Aguardando Pagamento';
+
+      // só o admin muda status (o pagamento é sempre conferido no Mercado Pago)
+      allow update, delete: if isAdmin();
+    }
+
+    // Qualquer outra coisa: bloqueado
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}

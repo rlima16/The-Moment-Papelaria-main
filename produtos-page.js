@@ -1,6 +1,6 @@
-import { db } from './firebase-auth.js?v=20261013';
+import { db } from './firebase-auth.js?v=20261014';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-import { createProductCard, categoryLabel, categoryIcon, categoryGroup } from './shared-functions.js?v=20261013';
+import { createProductCard, categoryLabel, categoryIcon, categoryGroup } from './shared-functions.js?v=20261014';
 
 // Carrega todos os produtos UMA vez e faz busca, filtro, ordenação e paginação no navegador.
 // Com ~120 produtos isso é mais rápido, gasta menos leituras do Firebase e permite
@@ -19,8 +19,10 @@ const COLECOES = {
     'festa-adulto': {
         titulo: 'Festa Adulto',
         descricao: 'Topos divertidos para aniversários de adultos: hobbies, profissões, comidinhas e muito estilo.',
-        palavras: ['academia', 'sushi', 'gastadeira', 'preto e dourado', 'dourado', 'medico', 'medica', 'futebol', 'cerveja', 'boteco',
-                   'churrasco', 'vinho', 'aposentad', 'formatura', 'formando', 'enfermeir', 'advogad', 'dentista', 'pescaria', 'chef', 'cafe']
+        // palavras inteiras (\b...\b) para não pegar, por exemplo, "Chefinho" quando a palavra é "Chef"
+        palavras: [/\bacademia\b/, /\bsushi\b/, /gastadeira/, /preto e dourado/, /\bdourado\b/, /\bmedic[oa]\b/, /\bfutebol\b/,
+                   /\bcerveja\b/, /\bchopp\b/, /\bboteco\b/, /\bchurrasco\b/, /\bvinho\b/, /\baposentad/, /\bformatura\b/, /\bformand[oa]/,
+                   /\benfermeir/, /\badvogad/, /\bdentista\b/, /\bpescaria\b/, /\bchef\b/, /\bcafe\b/]
     }
 };
 let currentPage = 0;
@@ -44,7 +46,7 @@ function getFilteredProducts() {
         });
     } else if (selectedColecao) {
         const palavras = COLECOES[selectedColecao].palavras;
-        list = list.filter(p => { const t = normalize(p.title); return palavras.some(w => t.includes(w)); });
+        list = list.filter(p => { const t = normalize(p.title); return palavras.some(re => re.test(t)); });
     } else if (selectedCategory) {
         list = list.filter(p => categoryGroup(p.category) === selectedCategory);
     }

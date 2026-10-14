@@ -1,6 +1,6 @@
 // cart-page.js ATUALIZADO NOVAMENTE
 
-import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261013';
+import { auth, db, collection, addDoc, serverTimestamp } from './firebase-auth.js?v=20261014';
 
 // 👇 Endereço do servidor de pagamentos (Cloudflare Worker). Troque depois de publicar o Worker.
 const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
