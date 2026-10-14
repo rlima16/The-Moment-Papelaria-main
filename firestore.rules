@@ -8,7 +8,7 @@ service cloud.firestore {
     // E-mails com acesso ao painel admin (mesma lista do admin.js)
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email in ['rodrigoalveslima5533@gmail.com'];
+        && request.auth.token.email in ['rodrigoalveslima5533@gmail.com', 'tatianesilvasantos@live.com'];
     }
     function isLogado() {
       return request.auth != null;

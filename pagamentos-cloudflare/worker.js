@@ -17,7 +17,7 @@ const PROJECT_ID = 'the-moment-b3e02';
 const FIREBASE_API_KEY = 'AIzaSyBhiNkiR7D_xI_W_2L2bLUG3gC1--HUn18'; // chave pública do site
 const SITE_URL = 'https://lojathemoment.shop';
 // E-mails que podem enviar arquivos pelo painel admin (mesma lista do admin.js)
-const ADMIN_EMAILS = ['rodrigoalveslima5533@gmail.com'];
+const ADMIN_EMAILS = ['rodrigoalveslima5533@gmail.com', 'tatianesilvasantos@live.com'];
 const MAX_ARQUIVO = 25 * 1024 * 1024; // limite do KV do Cloudflare
 const ALLOWED_ORIGINS = [
   SITE_URL, 'https://www.lojathemoment.shop',

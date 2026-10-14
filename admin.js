@@ -1,11 +1,11 @@
 // admin.js (VERSÃO FINAL CORRIGIDA)
 
-import { auth, db } from './firebase-auth.js?v=20261014';
+import { auth, db } from './firebase-auth.js?v=20261015';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, getDoc, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
 // 👇 E-mails que podem abrir o painel (adicione o da sua esposa aqui, se quiser)
-const ADMIN_EMAILS = ['rodrigoalveslima5533@gmail.com'];
+const ADMIN_EMAILS = ['rodrigoalveslima5533@gmail.com', 'tatianesilvasantos@live.com'];
 const PAYMENT_API_URL = 'https://the-moment-papelaria-main.rodrigoalveslima5533.workers.dev';
 
 const addView = document.getElementById('add-product-view');
